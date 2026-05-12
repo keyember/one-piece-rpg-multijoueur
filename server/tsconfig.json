@@ -9,8 +9,13 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "../../../shared/*": ["./shared/*"],
+      "../../shared/*": ["./shared/*"]
+    }
   },
-  "include": ["src", "../shared"],
+  "include": ["src", "shared"],
   "exclude": ["node_modules", "dist"]
 }
