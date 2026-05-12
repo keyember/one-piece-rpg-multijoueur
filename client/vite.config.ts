@@ -4,7 +4,6 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
+    allowedHosts: ['rpg.oudinallan.dev'],
   },
-  // VITE_SERVER_URL injecté au build via docker-compose args
-  // Ne jamais hardcoder d'URL ici
 });
