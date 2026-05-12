@@ -17,36 +17,30 @@ services:
       - NODE_ENV=production
       - CLIENT_ORIGIN=${CLIENT_ORIGIN}
     restart: unless-stopped
-    # Aucun port exposé vers l'extérieur
 
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
+      args:
+        - VITE_SERVER_URL=${CLIENT_ORIGIN}
     networks:
       - rpg-internal
       - traefik-public
-    build:
-      context: ./client
-      args:
-        - VITE_SERVER_URL=${CLIENT_ORIGIN}
     depends_on:
       - server
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      # Route principale : client
       - "traefik.http.routers.rpg.rule=Host(`rpg.oudinallan.dev`)"
       - "traefik.http.routers.rpg.entrypoints=websecure"
       - "traefik.http.routers.rpg.tls.certresolver=letsencrypt"
       - "traefik.http.services.rpg-client.loadbalancer.server.port=5173"
       - "traefik.http.routers.rpg.service=rpg-client"
-      # Route socket.io → server interne (jamais exposé directement)
       - "traefik.http.routers.rpg-socket.rule=Host(`rpg.oudinallan.dev`) && PathPrefix(`/socket.io`)"
       - "traefik.http.routers.rpg-socket.entrypoints=websecure"
       - "traefik.http.routers.rpg-socket.tls.certresolver=letsencrypt"
       - "traefik.http.services.rpg-socket.loadbalancer.server.port=3000"
       - "traefik.http.routers.rpg-socket.service=rpg-socket"
-      # Priorité plus haute pour socket.io
       - "traefik.http.routers.rpg-socket.priority=10"
       - "traefik.http.routers.rpg.priority=1"
