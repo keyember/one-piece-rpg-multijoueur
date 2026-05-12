@@ -11,14 +11,13 @@ export class LoginScene extends Phaser.Scene {
     super({ key: 'LoginScene' });
   }
 
-  // Vérifier si un token OAuth a été passé dans l'URL (retour OAuth)
   init(): void {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     if (token) {
       setAccessToken(token);
       window.history.replaceState({}, '', '/');
-      this.scene.start('WorldScene');
+      this.scene.start('MainMenuScene');
     }
   }
 
@@ -36,7 +35,6 @@ export class LoginScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    // Fond
     this.add.rectangle(width / 2, height / 2, width, height, 0x0a1628);
     this.add.text(width / 2, 80, '🏴‍☠️ ONE PIECE RPG', {
       fontSize: '42px', color: '#e8a000', fontStyle: 'bold',
@@ -81,7 +79,6 @@ export class LoginScene extends Phaser.Scene {
     container.appendChild(passwordInput);
     container.appendChild(errorDiv);
 
-    // Bouton principal
     const submitBtn = document.createElement('button');
     submitBtn.textContent = isRegister ? 'Créer mon compte' : 'Se connecter';
     submitBtn.style.cssText = `
@@ -93,16 +90,13 @@ export class LoginScene extends Phaser.Scene {
     submitBtn.addEventListener('mouseleave', () => (submitBtn.style.background = '#e8a000'));
     container.appendChild(submitBtn);
 
-    // Séparateur OAuth
     const sep = document.createElement('div');
     sep.innerHTML = '<hr style="border-color:#334;margin:4px 0"><span style="color:#888;font-size:13px">ou continuer avec</span><hr style="border-color:#334;margin:4px 0">';
-    sep.style.cssText = 'display:flex;align-items:center;gap:8px;color:#888;font-size:13px;';
+    sep.style.cssText = 'display:flex;align-items:center;gap:8px;';
     container.appendChild(sep);
 
-    // Boutons OAuth
     const oauthRow = document.createElement('div');
     oauthRow.style.cssText = 'display:flex;gap:10px;';
-
     const makeOAuthBtn = (label: string, color: string, href: string): HTMLAnchorElement => {
       const btn = document.createElement('a');
       btn.href = href;
@@ -116,18 +110,13 @@ export class LoginScene extends Phaser.Scene {
       btn.addEventListener('mouseleave', () => (btn.style.opacity = '1'));
       return btn;
     };
-
     oauthRow.appendChild(makeOAuthBtn('🎮 Discord', '#5865F2', `${SERVER_URL}/auth/discord`));
     oauthRow.appendChild(makeOAuthBtn('🔍 Google', '#4285F4', `${SERVER_URL}/auth/google`));
     container.appendChild(oauthRow);
 
-    // Toggle login/register
     const toggleBtn = document.createElement('button');
-    toggleBtn.textContent = isRegister ? 'Déjà un compte ? Se connecter' : 'Pas de compte ? S\'inscrire';
-    toggleBtn.style.cssText = `
-      background: none; border: none; color: #e8a000;
-      cursor: pointer; font-size: 13px; padding: 4px;
-    `;
+    toggleBtn.textContent = isRegister ? 'Déjà un compte ? Se connecter' : "Pas de compte ? S'inscrire";
+    toggleBtn.style.cssText = `background: none; border: none; color: #e8a000; cursor: pointer; font-size: 13px; padding: 4px;`;
     toggleBtn.addEventListener('click', () => {
       this.mode = isRegister ? 'login' : 'register';
       this.renderUI();
@@ -137,12 +126,10 @@ export class LoginScene extends Phaser.Scene {
     document.body.appendChild(container);
     this.elements.push(container);
 
-    // Submit
     const handleSubmit = async () => {
       errorDiv.textContent = '';
       submitBtn.disabled = true;
       submitBtn.textContent = 'Chargement...';
-
       try {
         let result;
         if (isRegister) {
@@ -152,7 +139,7 @@ export class LoginScene extends Phaser.Scene {
         }
         setAccessToken(result.accessToken);
         this.cleanup();
-        this.scene.start('WorldScene');
+        this.scene.start('MainMenuScene');
       } catch (err: any) {
         errorDiv.textContent = err.message ?? 'Erreur inconnue';
         submitBtn.disabled = false;
@@ -165,7 +152,5 @@ export class LoginScene extends Phaser.Scene {
     emailInput.focus();
   }
 
-  shutdown(): void {
-    this.cleanup();
-  }
+  shutdown(): void { this.cleanup(); }
 }
