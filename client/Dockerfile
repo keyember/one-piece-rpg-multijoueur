@@ -1,9 +1,10 @@
 FROM node:20-alpine
 WORKDIR /app
-COPY package*.json ./
+# Le contexte de build est la racine du repo
+# shared/ et client/ sont donc tous les deux accessibles
+COPY client/package*.json ./
 RUN npm install
-# Copier shared/ dans le container pour que Vite puisse le résoudre
-COPY ../shared ./shared
-COPY . .
+COPY shared/ ./shared/
+COPY client/ .
 EXPOSE 5173
 CMD ["npm", "run", "dev"]

@@ -9,9 +9,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // Pointe vers le shared/ copié dans le container
+      // shared/ est copié à la racine du container (/app/shared)
       '../../../shared': path.resolve(__dirname, './shared'),
-      '../../shared': path.resolve(__dirname, './shared'),
     },
   },
 });
