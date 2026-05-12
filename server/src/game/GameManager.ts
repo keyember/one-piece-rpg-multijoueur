@@ -1,4 +1,4 @@
-import { PlayerData, MoveInput } from '../../../shared/types';
+import { PlayerData, MoveInput } from 'shared/types';
 
 export class GameManager {
   private players: Map<string, PlayerData> = new Map();
@@ -36,7 +36,6 @@ export class GameManager {
   movePlayer(id: string, input: MoveInput): PlayerData | null {
     const player = this.players.get(id);
     if (!player) return null;
-
     player.x = input.x;
     player.y = input.y;
     player.direction = input.direction;

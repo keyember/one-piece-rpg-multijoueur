@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import { SOCKET_EVENTS, MoveInput, ChatMessage } from '../../../shared/types';
+import { SOCKET_EVENTS, MoveInput, ChatMessage } from 'shared/types';
 import { GameManager } from '../game/GameManager';
 import { JwtPayload } from '../auth/jwt';
 
@@ -24,13 +24,11 @@ export function registerSocketHandlers(
   socket: Socket,
   gameManager: GameManager
 ): void {
-  // L'utilisateur est déjà authentifié via le middleware socketAuth
   const user = (socket as any).user as JwtPayload;
 
   let lastMoveAt = 0;
   let lastChatAt = 0;
 
-  // Rejoindre automatiquement avec le username du JWT
   const player = gameManager.addPlayer(socket.id, user.username);
   socket.emit(SOCKET_EVENTS.GAME_STATE, { players: gameManager.getAllPlayers() });
   socket.broadcast.emit(SOCKET_EVENTS.PLAYER_JOINED, player);

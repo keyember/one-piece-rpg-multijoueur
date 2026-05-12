@@ -4,7 +4,6 @@
     "module": "commonjs",
     "lib": ["ES2020"],
     "outDir": "./dist",
-    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -12,8 +11,7 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "../../../shared/*": ["./shared/*"],
-      "../../shared/*": ["./shared/*"]
+      "shared/*": ["./shared/*"]
     }
   },
   "include": ["src", "shared"],
