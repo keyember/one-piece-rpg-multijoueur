@@ -12,106 +12,91 @@ export class MainMenuScene extends Phaser.Scene {
     if (!token) { this.scene.start('LoginScene'); return; }
 
     this.drawBackground();
-    this.renderHTML();
+    this.renderUI();
   }
 
   private drawBackground(): void {
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
-    const g = this.add.graphics();
 
-    // Fond nuit en mer
-    g.fillGradientStyle(0x050810, 0x050810, 0x0B1A2A, 0x0B1A2A, 1);
+    // Fond taverne sombre
+    const g = this.add.graphics();
+    g.fillGradientStyle(0x0E0804, 0x100905, 0x1A0D04, 0x180B03, 1);
     g.fillRect(0, 0, w, h);
 
-    // Étoiles pixel
-    const stars = this.add.graphics();
-    for (let i = 0; i < 80; i++) {
-      const bright = Math.random();
-      stars.fillStyle(0xF0EAD6, bright > 0.85 ? 1 : 0.3 + bright * 0.5);
-      const s = bright > 0.9 ? 2 : 1;
-      stars.fillRect(Math.floor(Math.random() * w), Math.floor(Math.random() * h * 0.7), s, s);
+    // Planches de bois
+    const wood = this.add.graphics();
+    for (let i = 0; i < 20; i++) {
+      wood.fillStyle(i % 2 === 0 ? 0x1A0A03 : 0x150802, 1);
+      wood.fillRect(i * 52, 0, 52, h);
+      wood.lineStyle(1, 0x0A0401, 0.8);
+      wood.lineBetween(i * 52, 0, i * 52, h);
     }
 
-    // Lune
-    const moon = this.add.graphics();
-    moon.fillStyle(0xF0EAD6, 0.9);
-    moon.fillCircle(w - 120, 80, 28);
-    moon.fillStyle(0x0B1A2A, 1);
-    moon.fillCircle(w - 110, 72, 22); // créant un croissant
+    // Lumière ambiante chaude (plusieurs bougies)
+    const lights = [[100, h*0.3], [w-100, h*0.4], [w*0.5, h*0.1]];
+    const gl = this.add.graphics();
+    lights.forEach(([lx, ly]) => {
+      for (let r = 200; r > 0; r -= 10) {
+        gl.fillStyle(0xC47008, 0.004);
+        gl.fillCircle(lx, ly, r);
+      }
+    });
 
-    // Mer en bas
-    const sea = this.add.graphics();
-    sea.fillGradientStyle(0x0D1B2A, 0x0D1B2A, 0x06101A, 0x06101A, 1);
-    sea.fillRect(0, h * 0.72, w, h * 0.28);
-
-    // Vagues pixel art
-    const waves = this.add.graphics();
-    waves.lineStyle(2, 0x1A3A5C, 0.8);
-    for (let i = 0; i < 5; i++) {
-      waves.strokeEllipse(w / 2, h * 0.72 + i * 60, w * 1.6 + i * 80, 60 + i * 30);
+    // Sol
+    const floor = this.add.graphics();
+    floor.fillGradientStyle(0x0A0502, 0x0A0502, 0x180B03, 0x180B03, 1);
+    floor.fillRect(0, h * 0.75, w, h * 0.25);
+    for (let i = 0; i < 12; i++) {
+      floor.lineStyle(1, 0x200E05, 0.6);
+      floor.lineBetween(i * 90, h * 0.75, i * 90, h);
     }
 
-    // Reflet lune sur mer
-    const reflect = this.add.graphics();
-    reflect.fillStyle(0xF0EAD6, 0.04);
-    reflect.fillRect(w - 140, h * 0.72, 40, h * 0.28);
+    // Ligne de séparation sol/mur
+    const border = this.add.graphics();
+    border.lineStyle(3, 0x5C2A10, 0.8);
+    border.lineBetween(0, h * 0.75, w, h * 0.75);
+    border.lineStyle(1, 0xC4891A, 0.3);
+    border.lineBetween(0, h * 0.75 + 4, w, h * 0.75 + 4);
 
-    // Silhouette bateau pixel art
-    this.drawPixelShip(w / 2 - 60, h * 0.68);
-
-    // Vignette
-    const vignette = this.add.graphics();
-    vignette.fillStyle(0x000000, 0);
-    // bords sombres
-    for (let i = 0; i < 40; i++) {
-      vignette.fillStyle(0x000000, 0.025);
-      vignette.fillRect(0, 0, i * 3, h);
-      vignette.fillRect(w - i * 3, 0, i * 3, h);
-    }
+    // Silhouettes meubles à gauche et droite
+    this.drawFurniture(w, h);
   }
 
-  private drawPixelShip(x: number, y: number): void {
+  private drawFurniture(w: number, h: number): void {
     const g = this.add.graphics();
-    const P = 4; // taille pixel
+    const floor = h * 0.75;
 
-    // Coque
-    g.fillStyle(0x3D1A08, 1);
-    const hull = [
-      [0,4],[1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[7,4],[8,4],[9,4],[10,4],[11,4],[12,4],
-      [1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[7,5],[8,5],[9,5],[10,5],[11,5],
-      [2,6],[3,6],[4,6],[5,6],[6,6],[7,6],[8,6],[9,6],[10,6],
-      [3,7],[4,7],[5,7],[6,7],[7,7],[8,7],[9,7],
-    ];
-    hull.forEach(([px, py]) => g.fillRect(x + px * P, y + py * P, P, P));
-
-    // Détail coque
+    // Baril gauche
+    g.fillStyle(0x3D1F08, 1);
+    g.fillRect(40, floor - 60, 50, 60);
     g.fillStyle(0x5C2A10, 1);
-    [[1,4],[2,4],[3,4]].forEach(([px, py]) => g.fillRect(x + px * P, y + py * P, P, P));
+    g.fillRect(40, floor - 60, 50, 6);
+    g.fillRect(40, floor - 32, 50, 6);
+    g.fillRect(40, floor - 6, 50, 6);
+    g.fillStyle(0x8B6914, 0.6);
+    g.lineStyle(2, 0x8B6914, 0.6);
+    g.strokeRect(40, floor - 60, 50, 60);
 
-    // Voile principale
-    g.fillStyle(0xF0EAD6, 0.9);
-    const sail = [
-      [5,0],[6,0],
-      [4,1],[5,1],[6,1],[7,1],
-      [4,2],[5,2],[6,2],[7,2],
-      [5,3],[6,3],
-    ];
-    sail.forEach(([px, py]) => g.fillRect(x + px * P, y + py * P, P, P));
-
-    // Croix rouge sur voile (One Piece style)
-    g.fillStyle(0xD62828, 1);
-    [[5,1],[6,1],[5,2],[6,2]].forEach(([px, py]) => g.fillRect(x + px * P, y + py * P, P, P));
-
-    // Mât
+    // Baril droit
+    g.fillStyle(0x3D1F08, 1);
+    g.fillRect(w - 80, floor - 80, 55, 80);
     g.fillStyle(0x5C2A10, 1);
-    [[6,0],[6,1],[6,2],[6,3],[6,4]].forEach(([px, py]) => g.fillRect(x + px * P, y + py * P, P / 2, P));
+    g.fillRect(w - 80, floor - 80, 55, 7);
+    g.fillRect(w - 80, floor - 42, 55, 7);
+    g.fillRect(w - 80, floor - 8, 55, 8);
 
-    // Drapeau skull
-    g.fillStyle(0x0B0F1A, 1);
-    g.fillRect(x + 6 * P, y - P, P * 2, P);
-    g.fillStyle(0xF0EAD6, 1);
-    g.fillRect(x + 6 * P + 2, y - P + 2, 4, 4);
+    // Table à droite
+    g.fillStyle(0x2E1507, 1);
+    g.fillRect(w - 200, floor - 40, 120, 8);
+    g.fillRect(w - 185, floor - 32, 10, 32);
+    g.fillRect(w - 100, floor - 32, 10, 32);
+
+    // Chaise
+    g.fillRect(w - 210, floor - 55, 8, 55);
+    g.fillRect(w - 210, floor - 55, 40, 6);
+    g.fillRect(w - 210, floor - 30, 40, 6);
+    g.fillRect(w - 175, floor - 24, 8, 24);
   }
 
   private cleanup(): void {
@@ -119,76 +104,87 @@ export class MainMenuScene extends Phaser.Scene {
     this.elements = [];
   }
 
-  private renderHTML(): void {
+  private renderUI(): void {
     this.cleanup();
 
-    const scanlines = document.createElement('div');
-    scanlines.className = 'op-scanlines';
-    document.body.appendChild(scanlines);
-    this.elements.push(scanlines);
+    const scene = document.createElement('div');
+    scene.className = 'op-menu-scene';
 
-    const overlay = document.createElement('div');
-    overlay.className = 'op-menu-overlay';
+    const board = document.createElement('div');
+    board.className = 'op-tavern-board';
+
+    // Clous supplémentaires
+    const nailTR = document.createElement('span');
+    nailTR.className = 'op-nail op-nail-tr';
+    const nailBL = document.createElement('span');
+    nailBL.className = 'op-nail op-nail-bl';
+    board.appendChild(nailTR);
+    board.appendChild(nailBL);
+
+    // Parchemin épinglé
+    const note = document.createElement('div');
+    note.className = 'op-pinned-note';
+    note.innerHTML = '<div class="op-pin"></div>Aujourd\'hui : Soupe de mer + Rhum du pays';
+    board.appendChild(note);
 
     // Titre
-    const titleWrap = document.createElement('div');
-    titleWrap.className = 'op-menu-title-wrap';
-    titleWrap.innerHTML = `
-      <span class="op-menu-title">🏴‍☠️ ONE PIECE RPG</span>
-      <span class="op-menu-title-sub">GRAND LINE ONLINE</span>
+    board.innerHTML += `
+      <div class="op-board-title">
+        <span class="op-board-title-main">🏴‍☠️ ONE PIECE</span>
+        <span class="op-board-ornament">⚓ • ⚔ • ⚓</span>
+        <span class="op-board-title-sub">GRAND LINE ONLINE — RPG MULTIJOUEUR</span>
+      </div>
     `;
-    overlay.appendChild(titleWrap);
 
-    // Navigation
-    const nav = document.createElement('nav');
-    nav.className = 'op-menu-nav';
+    // Boutons
+    const nav = document.createElement('div');
+    nav.className = 'op-menu-items';
 
     const items = [
-      { icon: '▶', label: 'JOUER',        cls: '',       action: () => { this.cleanup(); this.scene.start('WorldScene'); } },
-      { icon: '⚔',  label: 'PERSONNAGE',  cls: '',       action: () => this.showModal('PERSONNAGE', 'Créez et gérez votre pirate. Bientôt disponible !') },
-      { icon: '⚙',  label: 'PARAMÈTRES',  cls: '',       action: () => this.showModal('PARAMÈTRES', 'Options audio, vidéo et contrôles. Bientôt disponible !') },
-      { icon: '🔒', label: 'DÉCONNEXION', cls: 'danger', action: () => this.handleLogout() },
+      { icon: '▶', label: 'PRENDRE LA MER',  cls: '',       fn: () => { this.cleanup(); this.scene.start('WorldScene'); } },
+      { icon: '⚔',  label: 'MON PIRATE',      cls: '',       fn: () => this.showModal('MON PIRATE', 'Créez et gérez votre personnage, choisissez votre fruit du démon et votre équipage. Bientôt disponible !') },
+      { icon: '🗺', label: 'LA CARTE',        cls: '',       fn: () => this.showModal('LA CARTE', 'Explorez le monde de One Piece : East Blue, Grand Line, Nouveau Monde... Bientôt disponible !') },
+      { icon: '⚙',  label: 'OPTIONS',         cls: '',       fn: () => this.showModal('OPTIONS', 'Paramètres audio, vidéo et contrôles du jeu. Bientôt disponible !') },
+      { icon: '🚪', label: 'QUITTER LE PORT', cls: 'danger', fn: () => this.handleLogout() },
     ];
 
     items.forEach(item => {
       const btn = document.createElement('button');
-      btn.className = `op-menu-btn ${item.cls}`;
-      btn.innerHTML = `<span class="op-menu-btn-icon">${item.icon}</span>${item.label}`;
-      btn.addEventListener('click', item.action);
+      btn.className = `op-menu-item ${item.cls}`;
+      btn.innerHTML = `<span class="op-menu-item-icon">${item.icon}</span><span>${item.label}</span>`;
+      btn.addEventListener('click', item.fn);
       nav.appendChild(btn);
     });
 
-    overlay.appendChild(nav);
+    board.appendChild(nav);
 
-    // Version + bounty
-    const version = document.createElement('div');
-    version.className = 'op-menu-version';
-    version.textContent = 'V 0.1.0 — DEV BUILD';
-    overlay.appendChild(version);
+    // Footer
+    board.innerHTML += `
+      <div class="op-board-footer">
+        <span class="op-board-footer-left">"Je serai le Roi des Pirates !"</span>
+        <span class="op-board-footer-right">v0.1.0 — DEV BUILD<br>GRAND LINE ONLINE</span>
+      </div>
+    `;
 
-    const bounty = document.createElement('div');
-    bounty.className = 'op-menu-bounty';
-    bounty.textContent = '» WANTED «  DEAD OR ALIVE';
-    overlay.appendChild(bounty);
-
-    document.body.appendChild(overlay);
-    this.elements.push(overlay);
+    scene.appendChild(board);
+    document.body.appendChild(scene);
+    this.elements.push(scene);
   }
 
   private showModal(title: string, text: string): void {
-    const overlayEl = document.createElement('div');
-    overlayEl.className = 'op-modal-overlay';
-    overlayEl.innerHTML = `
-      <div class="op-modal">
-        <div class="op-modal-title">${title}</div>
-        <div class="op-modal-text">${text}</div>
-        <button class="op-modal-close">FERMER</button>
+    const bg = document.createElement('div');
+    bg.className = 'op-modal-bg';
+    bg.innerHTML = `
+      <div class="op-modal-parchment">
+        <div class="op-modal-parchment-title">${title}</div>
+        <div class="op-modal-parchment-text">${text}</div>
+        <button class="op-modal-parchment-btn">FERMER</button>
       </div>
     `;
-    overlayEl.querySelector('.op-modal-close')!.addEventListener('click', () => overlayEl.remove());
-    overlayEl.addEventListener('click', e => { if (e.target === overlayEl) overlayEl.remove(); });
-    document.body.appendChild(overlayEl);
-    this.elements.push(overlayEl);
+    bg.querySelector('button')!.addEventListener('click', () => bg.remove());
+    bg.addEventListener('click', e => { if (e.target === bg) bg.remove(); });
+    document.body.appendChild(bg);
+    this.elements.push(bg);
   }
 
   private async handleLogout(): Promise<void> {

@@ -21,7 +21,7 @@ export class LoginScene extends Phaser.Scene {
 
   create(): void {
     this.drawBackground();
-    this.renderHTML();
+    this.renderUI();
   }
 
   private drawBackground(): void {
@@ -29,33 +29,33 @@ export class LoginScene extends Phaser.Scene {
     const h = this.cameras.main.height;
     const g = this.add.graphics();
 
-    // Fond mer profonde
-    g.fillGradientStyle(0x0B0F1A, 0x0B0F1A, 0x0D1B2A, 0x0D1B2A, 1);
+    // Taverne sombre
+    g.fillGradientStyle(0x0E0804, 0x0E0804, 0x1A0D04, 0x1A0D04, 1);
     g.fillRect(0, 0, w, h);
 
-    // Vagues pixel art
-    const wave = this.add.graphics();
-    wave.lineStyle(1, 0x1A3A5C, 0.5);
-    for (let i = 0; i < 8; i++) {
-      wave.strokeEllipse(w / 2, h + 80 + i * 90, w * 1.8 + i * 120, 180 + i * 50);
+    // Planches de bois verticales en fond
+    const wood = this.add.graphics();
+    for (let i = 0; i < 20; i++) {
+      wood.fillStyle(i % 2 === 0 ? 0x1A0A03 : 0x150802, 1);
+      wood.fillRect(i * 52, 0, 52, h);
+      wood.lineStyle(1, 0x0A0401, 0.8);
+      wood.lineBetween(i * 52, 0, i * 52, h);
     }
 
-    // Particules décoratives (étoiles)
-    const stars = this.add.graphics();
-    stars.fillStyle(0xF0EAD6, 1);
-    for (let i = 0; i < 60; i++) {
-      const x = Math.random() * w;
-      const y = Math.random() * h * 0.6;
-      const s = Math.random() < 0.3 ? 2 : 1;
-      stars.fillRect(Math.floor(x), Math.floor(y), s, s);
+    // Lumière bougie à gauche
+    const light1 = this.add.graphics();
+    light1.fillStyle(0xD4820A, 0);
+    for (let r = 180; r > 0; r -= 8) {
+      light1.fillStyle(0xD4820A, 0.006);
+      light1.fillCircle(180, h * 0.4, r);
     }
 
-    // Ligne rouge horizontale décorative
-    const deco = this.add.graphics();
-    deco.lineStyle(2, 0xD62828, 0.6);
-    deco.lineBetween(0, h * 0.62, w, h * 0.62);
-    deco.lineStyle(1, 0x8B6914, 0.4);
-    deco.lineBetween(0, h * 0.62 + 4, w, h * 0.62 + 4);
+    // Lumière bougie à droite
+    const light2 = this.add.graphics();
+    for (let r = 150; r > 0; r -= 8) {
+      light2.fillStyle(0xD4820A, 0.005);
+      light2.fillCircle(w - 160, h * 0.5, r);
+    }
   }
 
   private cleanup(): void {
@@ -63,113 +63,140 @@ export class LoginScene extends Phaser.Scene {
     this.elements = [];
   }
 
-  private renderHTML(): void {
+  private renderUI(): void {
     this.cleanup();
     const isReg = this.mode === 'register';
 
-    // Scanlines
-    const scanlines = document.createElement('div');
-    scanlines.className = 'op-scanlines';
-    document.body.appendChild(scanlines);
-    this.elements.push(scanlines);
+    const scene = document.createElement('div');
+    scene.className = 'op-login-scene';
 
-    const wrapper = document.createElement('div');
-    wrapper.className = 'op-auth-wrapper';
+    const poster = document.createElement('div');
+    poster.className = 'op-wanted-poster';
 
-    // Logo
-    const logo = document.createElement('div');
-    logo.innerHTML = `
-      <div class="op-auth-logo">🏴‍☠️ ONE PIECE RPG</div>
-      <div class="op-auth-subtitle">MULTIJOUEUR</div>
+    // Tampon filigrane
+    const stamp = document.createElement('div');
+    stamp.className = 'op-stamp';
+    stamp.textContent = 'MARINE';
+    poster.appendChild(stamp);
+
+    // En-tête
+    poster.innerHTML += `
+      <div class="op-poster-header">
+        <span class="op-poster-authority">⚓ GOUVERNEMENT MONDIAL • MARINE HQ – G.L. • ⚓</span>
+        <span class="op-poster-wanted">WANTED</span>
+        <span class="op-poster-dead-alive">— DEAD OR ALIVE —</span>
+      </div>
     `;
-    wrapper.appendChild(logo);
+    poster.appendChild(stamp);
 
-    // Card
-    const card = document.createElement('div');
-    card.className = 'op-auth-card';
+    // Zone photo silhouette
+    const photo = document.createElement('div');
+    photo.className = 'op-poster-photo';
+    photo.innerHTML = `<div class="op-poster-photo-inner">${isReg ? 'IDENTITY\nUNKNOWN' : 'IDENTIFY\nYOURSELF'}</div>`;
+    poster.appendChild(photo);
 
     // Tabs
     const tabs = document.createElement('div');
-    tabs.className = 'op-tabs';
-    const tabLogin = document.createElement('button');
-    tabLogin.className = `op-tab ${!isReg ? 'active' : ''}`;
-    tabLogin.textContent = 'CONNEXION';
+    tabs.className = 'op-poster-tabs';
+    const tabConn = document.createElement('button');
+    tabConn.className = `op-poster-tab ${!isReg ? 'active' : ''}`;
+    tabConn.textContent = 'IDENTIFY';
     const tabReg = document.createElement('button');
-    tabReg.className = `op-tab ${isReg ? 'active' : ''}`;
-    tabReg.textContent = 'INSCRIPTION';
-    tabLogin.onclick = () => { this.mode = 'login'; this.renderHTML(); };
-    tabReg.onclick = () => { this.mode = 'register'; this.renderHTML(); };
-    tabs.appendChild(tabLogin);
+    tabReg.className = `op-poster-tab ${isReg ? 'active' : ''}`;
+    tabReg.textContent = 'ENLIST';
+    tabConn.onclick = () => { this.mode = 'login'; this.renderUI(); };
+    tabReg.onclick = () => { this.mode = 'register'; this.renderUI(); };
+    tabs.appendChild(tabConn);
     tabs.appendChild(tabReg);
-    card.appendChild(tabs);
+    poster.appendChild(tabs);
 
-    const mk = (type: string, ph: string) => {
-      const i = document.createElement('input');
-      i.type = type; i.placeholder = ph; i.className = 'op-input';
-      return i;
+    const mkField = (labelTxt: string, type: string, placeholder: string): [HTMLDivElement, HTMLInputElement] => {
+      const field = document.createElement('div');
+      field.className = 'op-poster-field';
+      const label = document.createElement('label');
+      label.className = 'op-poster-label';
+      label.textContent = labelTxt;
+      const input = document.createElement('input');
+      input.type = type;
+      input.placeholder = placeholder;
+      input.className = 'op-poster-input';
+      field.appendChild(label);
+      field.appendChild(input);
+      return [field, input];
     };
 
-    const email = mk('email', 'Email');
-    const username = mk('text', 'Pseudo — ton nom de pirate');
-    const password = mk('password', 'Mot de passe');
-    const error = document.createElement('div');
-    error.className = 'op-error';
+    const [emailField, emailInput] = mkField('IDENTIFIANT (EMAIL)', 'email', 'votre email...');
+    const [userField, userInput] = mkField('NOM DE PIRATE', 'text', 'ex: chapeau_de_paille');
+    const [passField, passInput] = mkField('MOT DE PASSE SECRET', 'password', '••••••••');
 
-    card.appendChild(email);
-    if (isReg) card.appendChild(username);
-    card.appendChild(password);
-    card.appendChild(error);
+    poster.appendChild(emailField);
+    if (isReg) poster.appendChild(userField);
+    poster.appendChild(passField);
 
-    const submitBtn = document.createElement('button');
-    submitBtn.className = 'op-btn-primary';
-    submitBtn.textContent = isReg ? 'PARTIR EN MER !' : 'HISSER LES VOILES !';
-    card.appendChild(submitBtn);
+    // Bounty
+    const bountyWrap = document.createElement('div');
+    bountyWrap.innerHTML = `
+      <div class="op-poster-bounty-label">PRIME</div>
+      <div class="op-poster-bounty-amount">0 <span class="op-poster-bounty-unit">Berry</span></div>
+    `;
+    poster.appendChild(bountyWrap);
+
+    // Erreur
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'op-poster-error';
+    poster.appendChild(errorDiv);
+
+    // Bouton
+    const btn = document.createElement('button');
+    btn.className = 'op-poster-btn';
+    btn.textContent = isReg ? 'S\'ENRÔLER !' : 'CONFIRMER L\'IDENTITÉ';
+    poster.appendChild(btn);
 
     // OAuth
-    const divider = document.createElement('div');
-    divider.className = 'op-divider';
-    divider.textContent = 'ou';
-    card.appendChild(divider);
+    const div = document.createElement('div');
+    div.className = 'op-poster-divider';
+    div.textContent = 'ou via Den Den Mushi';
+    poster.appendChild(div);
 
     const oauthRow = document.createElement('div');
-    oauthRow.className = 'op-oauth-row';
-    const disc = document.createElement('a');
-    disc.href = `${SERVER_URL}/auth/discord`;
-    disc.className = 'op-oauth-btn op-oauth-discord';
-    disc.textContent = '🎮 DISCORD';
-    const goog = document.createElement('a');
-    goog.href = `${SERVER_URL}/auth/google`;
-    goog.className = 'op-oauth-btn op-oauth-google';
-    goog.textContent = '🔍 GOOGLE';
-    oauthRow.appendChild(disc);
-    oauthRow.appendChild(goog);
-    card.appendChild(oauthRow);
+    oauthRow.className = 'op-poster-oauth';
+    const discord = document.createElement('a');
+    discord.href = `${SERVER_URL}/auth/discord`;
+    discord.className = 'op-poster-oauth-btn op-oauth-discord';
+    discord.textContent = '🎮 DISCORD';
+    const google = document.createElement('a');
+    google.href = `${SERVER_URL}/auth/google`;
+    google.className = 'op-poster-oauth-btn op-oauth-google';
+    google.textContent = '🔍 GOOGLE';
+    oauthRow.appendChild(discord);
+    oauthRow.appendChild(google);
+    poster.appendChild(oauthRow);
 
-    wrapper.appendChild(card);
-    document.body.appendChild(wrapper);
-    this.elements.push(wrapper);
+    scene.appendChild(poster);
+    document.body.appendChild(scene);
+    this.elements.push(scene);
 
     const submit = async () => {
-      error.textContent = '';
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'CHARGEMENT...';
+      errorDiv.textContent = '';
+      btn.disabled = true;
+      btn.textContent = 'EN COURS...';
       try {
         const res = isReg
-          ? await register(email.value.trim(), username.value.trim(), password.value)
-          : await login(email.value.trim(), password.value);
+          ? await register(emailInput.value.trim(), userInput.value.trim(), passInput.value)
+          : await login(emailInput.value.trim(), passInput.value);
         setAccessToken(res.accessToken);
         this.cleanup();
         this.scene.start('MainMenuScene');
       } catch (e: any) {
-        error.textContent = e.message ?? 'Erreur inconnue';
-        submitBtn.disabled = false;
-        submitBtn.textContent = isReg ? 'PARTIR EN MER !' : 'HISSER LES VOILES !';
+        errorDiv.textContent = e.message ?? 'Erreur inconnue';
+        btn.disabled = false;
+        btn.textContent = isReg ? 'S\'ENRÔLER !' : 'CONFIRMER L\'IDENTITÉ';
       }
     };
 
-    submitBtn.addEventListener('click', submit);
-    password.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
-    email.focus();
+    btn.addEventListener('click', submit);
+    passInput.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+    emailInput.focus();
   }
 
   shutdown(): void { this.cleanup(); }
