@@ -2,6 +2,9 @@ import Phaser from 'phaser';
 import { io, Socket } from 'socket.io-client';
 import { PlayerData, MoveInput, ChatMessage, SOCKET_EVENTS, GameState } from '../../../shared/types';
 
+// L'URL vient de la variable d'env Vite, jamais en dur
+const SERVER_URL = import.meta.env.VITE_SERVER_URL ?? '/';
+
 export class WorldScene extends Phaser.Scene {
   private socket!: Socket;
   private localPlayer!: Phaser.GameObjects.Rectangle;
@@ -25,16 +28,13 @@ export class WorldScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    // Fond : mer simple
     this.add.rectangle(width / 2, height / 2, width, height, 0x1a3a5c);
 
-    // Grille décorative
     const grid = this.add.graphics();
     grid.lineStyle(1, 0x1e4a7a, 0.3);
     for (let x = 0; x < width; x += 64) grid.lineBetween(x, 0, x, height);
     for (let y = 0; y < height; y += 64) grid.lineBetween(0, y, width, y);
 
-    // Joueur local (placeholder rectangle rouge)
     this.localPlayer = this.add.rectangle(width / 2, height / 2, 32, 32, 0xe63232);
     this.physics.add.existing(this.localPlayer);
 
@@ -45,7 +45,6 @@ export class WorldScene extends Phaser.Scene {
       padding: { x: 4, y: 2 },
     }).setOrigin(0.5);
 
-    // Contrôles
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.wasd = {
       up: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.W),
@@ -54,17 +53,20 @@ export class WorldScene extends Phaser.Scene {
       right: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D),
     };
 
-    // Connexion Socket.io
-    this.socket = io('http://localhost:3000');
+    this.socket = io(SERVER_URL, {
+      withCredentials: true,
+      // Reconnexion automatique limitée
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
+    });
+
     this.setupSocketEvents();
     this.socket.emit(SOCKET_EVENTS.PLAYER_JOIN, this.playerName);
 
-    // UI : compteur joueurs
     this.add.text(10, 10, '🏴‍☠️ One Piece RPG', { fontSize: '14px', color: '#e8a000' });
   }
 
   private setupSocketEvents(): void {
-    // État initial
     this.socket.on(SOCKET_EVENTS.GAME_STATE, (state: GameState) => {
       Object.values(state.players).forEach((player) => {
         if (player.id !== this.socket.id) {
@@ -73,12 +75,10 @@ export class WorldScene extends Phaser.Scene {
       });
     });
 
-    // Nouveau joueur
     this.socket.on(SOCKET_EVENTS.PLAYER_JOINED, (player: PlayerData) => {
       this.addOtherPlayer(player);
     });
 
-    // Joueur parti
     this.socket.on(SOCKET_EVENTS.PLAYER_LEFT, (playerId: string) => {
       const other = this.otherPlayers.get(playerId);
       if (other) {
@@ -88,7 +88,6 @@ export class WorldScene extends Phaser.Scene {
       }
     });
 
-    // Mouvement autre joueur
     this.socket.on(SOCKET_EVENTS.PLAYER_MOVED, (player: PlayerData) => {
       const other = this.otherPlayers.get(player.id);
       if (other) {
