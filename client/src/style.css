@@ -1,21 +1,446 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ===== RESET & BASE ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --op-red:     #D62828;
+  --op-gold:    #F7B731;
+  --op-dark:    #0B0F1A;
+  --op-navy:    #0D1B2A;
+  --op-blue:    #1A3A5C;
+  --op-white:   #F0EAD6;
+  --op-parchment: #2A1F0E;
+  --op-border:  #8B6914;
+  --pixel: 2px;
 }
 
 body {
-  background-color: #0a1628;
+  background: var(--op-dark);
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   overflow: hidden;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Noto Sans JP', sans-serif;
+  image-rendering: pixelated;
 }
 
+/* ===== CANVAS ===== */
 #game-container canvas {
   display: block;
-  border: 2px solid #e8a000;
-  box-shadow: 0 0 30px rgba(232, 160, 0, 0.4);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
+
+/* ===== PIXEL BORDER MIXIN ===== */
+.pixel-box {
+  border: var(--pixel) solid var(--op-border);
+  box-shadow:
+    0 0 0 var(--pixel) var(--op-dark),
+    0 0 0 calc(var(--pixel)*2) var(--op-border),
+    inset 0 0 0 var(--pixel) var(--op-parchment);
+  background: var(--op-parchment);
+}
+
+/* ===== AUTH FORM ===== */
+.op-auth-wrapper {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(214,40,40,0.15) 0%, transparent 60%),
+    linear-gradient(180deg, #0B0F1A 0%, #0D1B2A 100%);
+  z-index: 10;
+}
+
+.op-auth-logo {
+  font-family: 'Bangers', cursive;
+  font-size: 64px;
+  color: var(--op-gold);
+  text-shadow:
+    3px 3px 0 var(--op-red),
+    6px 6px 0 #7a1010,
+    0 0 40px rgba(247,183,49,0.4);
+  letter-spacing: 4px;
+  margin-bottom: 6px;
+  line-height: 1;
+}
+
+.op-auth-subtitle {
+  font-family: 'Bangers', cursive;
+  font-size: 20px;
+  color: var(--op-white);
+  letter-spacing: 10px;
+  margin-bottom: 32px;
+  opacity: 0.7;
+}
+
+.op-auth-card {
+  width: 380px;
+  background: linear-gradient(160deg, #12233a 0%, #0d1b2a 100%);
+  border: 2px solid var(--op-border);
+  box-shadow:
+    0 0 0 1px #0B0F1A,
+    0 0 0 3px var(--op-border),
+    0 0 30px rgba(247,183,49,0.1),
+    inset 0 1px 0 rgba(247,183,49,0.1);
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.op-auth-card::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--op-gold), var(--op-red), var(--op-gold), transparent);
+  margin: -28px -32px 20px;
+}
+
+.op-tabs {
+  display: flex;
+  gap: 0;
+  margin: -4px -4px 4px;
+}
+
+.op-tab {
+  flex: 1;
+  padding: 8px;
+  font-family: 'Bangers', cursive;
+  font-size: 18px;
+  letter-spacing: 2px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #1e3a5c;
+  color: #556;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.op-tab.active {
+  color: var(--op-gold);
+  border-bottom: 2px solid var(--op-gold);
+}
+
+.op-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: 'Noto Sans JP', sans-serif;
+  background: #060e18;
+  border: 1px solid #1e3a5c;
+  border-bottom: 2px solid #1e3a5c;
+  color: var(--op-white);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+}
+
+.op-input::placeholder { color: #445; }
+
+.op-input:focus {
+  border-color: var(--op-gold);
+  box-shadow: 0 2px 0 var(--op-gold), inset 0 0 12px rgba(247,183,49,0.05);
+}
+
+.op-btn-primary {
+  width: 100%;
+  padding: 13px;
+  font-family: 'Bangers', cursive;
+  font-size: 22px;
+  letter-spacing: 3px;
+  background: linear-gradient(180deg, var(--op-red) 0%, #9e1a1a 100%);
+  color: var(--op-white);
+  border: none;
+  border-bottom: 3px solid #6e0f0f;
+  cursor: pointer;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  transition: filter .15s, transform .1s;
+  position: relative;
+}
+
+.op-btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.op-btn-primary:hover { filter: brightness(1.15); }
+.op-btn-primary:active { transform: translateY(2px); border-bottom-width: 1px; }
+.op-btn-primary:disabled { filter: grayscale(0.6); cursor: not-allowed; }
+
+.op-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #334;
+  font-size: 12px;
+}
+.op-divider::before, .op-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #1e3a5c;
+}
+
+.op-oauth-row { display: flex; gap: 10px; }
+
+.op-oauth-btn {
+  flex: 1;
+  padding: 9px;
+  font-family: 'Bangers', cursive;
+  font-size: 15px;
+  letter-spacing: 1px;
+  border: 1px solid;
+  border-radius: 0;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+  transition: filter .15s;
+  clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+}
+.op-oauth-btn:hover { filter: brightness(1.2); }
+.op-oauth-discord { background: #2f3278; border-color: #5865F2; color: #fff; }
+.op-oauth-google  { background: #1e3060; border-color: #4285F4; color: #fff; }
+
+.op-error {
+  color: #ff6b6b;
+  font-size: 13px;
+  min-height: 16px;
+  text-align: center;
+  font-family: 'Bangers', cursive;
+  letter-spacing: 1px;
+}
+
+.op-toggle {
+  background: none;
+  border: none;
+  color: #556;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: center;
+  transition: color .2s;
+}
+.op-toggle:hover { color: var(--op-gold); }
+
+/* ===== MAIN MENU ===== */
+.op-menu-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.op-menu-title-wrap {
+  text-align: center;
+  margin-bottom: 40px;
+  pointer-events: none;
+}
+
+.op-menu-title {
+  font-family: 'Bangers', cursive;
+  font-size: 72px;
+  color: var(--op-gold);
+  text-shadow:
+    4px 4px 0 var(--op-red),
+    8px 8px 0 #5a0a0a,
+    0 0 60px rgba(247,183,49,0.5);
+  letter-spacing: 6px;
+  line-height: 0.9;
+  display: block;
+}
+
+.op-menu-title-sub {
+  font-family: 'Bangers', cursive;
+  font-size: 18px;
+  color: var(--op-white);
+  letter-spacing: 14px;
+  opacity: 0.5;
+  margin-top: 6px;
+  display: block;
+}
+
+.op-menu-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 360px;
+  pointer-events: all;
+}
+
+.op-menu-btn {
+  width: 100%;
+  padding: 14px 28px;
+  font-family: 'Bangers', cursive;
+  font-size: 24px;
+  letter-spacing: 4px;
+  text-align: left;
+  background: linear-gradient(90deg, rgba(13,27,42,0.95) 0%, rgba(10,15,26,0.8) 100%);
+  color: var(--op-white);
+  border: 1px solid #1e3a5c;
+  border-left: 3px solid var(--op-border);
+  cursor: pointer;
+  transition: all .18s;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.op-menu-btn::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--op-red);
+  transform: scaleY(0);
+  transition: transform .18s;
+  transform-origin: bottom;
+}
+
+.op-menu-btn:hover {
+  background: linear-gradient(90deg, rgba(214,40,40,0.2) 0%, rgba(13,27,42,0.95) 100%);
+  border-left-color: var(--op-red);
+  color: var(--op-gold);
+  letter-spacing: 6px;
+}
+
+.op-menu-btn:hover::before { transform: scaleY(1); }
+
+.op-menu-btn-icon {
+  display: inline-block;
+  width: 28px;
+  margin-right: 8px;
+  text-align: center;
+}
+
+.op-menu-btn.danger { border-left-color: #4a1010; }
+.op-menu-btn.danger:hover {
+  background: linear-gradient(90deg, rgba(214,40,40,0.15) 0%, rgba(13,27,42,0.95) 100%);
+  color: #ff6b6b;
+}
+
+.op-menu-version {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  font-size: 11px;
+  color: #223;
+  font-family: 'Bangers', cursive;
+  letter-spacing: 2px;
+  pointer-events: none;
+}
+
+.op-menu-bounty {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  font-size: 11px;
+  color: #334;
+  font-family: 'Bangers', cursive;
+  letter-spacing: 1px;
+  pointer-events: none;
+}
+
+/* ===== SCANLINES EFFECT ===== */
+.op-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* ===== HUD IN GAME ===== */
+.op-hud {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: linear-gradient(180deg, rgba(11,15,26,0.9) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 20;
+  font-family: 'Bangers', cursive;
+  letter-spacing: 2px;
+}
+
+.op-hud-title {
+  font-size: 20px;
+  color: var(--op-gold);
+  text-shadow: 2px 2px 0 var(--op-red);
+}
+
+/* ===== COMING SOON MODAL ===== */
+.op-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  pointer-events: all;
+}
+
+.op-modal {
+  background: linear-gradient(160deg, #12233a, #0d1b2a);
+  border: 2px solid var(--op-border);
+  box-shadow: 0 0 0 1px #0B0F1A, 0 0 40px rgba(247,183,49,0.15);
+  padding: 32px 40px;
+  text-align: center;
+  clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  min-width: 320px;
+}
+
+.op-modal::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--op-gold), var(--op-red), var(--op-gold), transparent);
+  margin: -32px -40px 24px;
+}
+
+.op-modal-title {
+  font-family: 'Bangers', cursive;
+  font-size: 32px;
+  color: var(--op-gold);
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+}
+
+.op-modal-text {
+  color: #889;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.op-modal-close {
+  font-family: 'Bangers', cursive;
+  font-size: 18px;
+  letter-spacing: 3px;
+  padding: 8px 28px;
+  background: transparent;
+  border: 1px solid var(--op-border);
+  color: var(--op-gold);
+  cursor: pointer;
+  transition: background .2s;
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+}
+.op-modal-close:hover { background: rgba(247,183,49,0.1); }
