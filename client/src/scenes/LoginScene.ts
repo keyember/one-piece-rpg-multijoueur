@@ -20,31 +20,12 @@ export class LoginScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.drawBackground();
-    this.renderUI();
-  }
-
-  private drawBackground(): void {
-    const w = this.cameras.main.width;
-    const h = this.cameras.main.height;
-    const g = this.add.graphics();
-    g.fillGradientStyle(0x0E0804, 0x0E0804, 0x1A0D04, 0x1A0D04, 1);
-    g.fillRect(0, 0, w, h);
-
-    const wood = this.add.graphics();
-    for (let i = 0; i < 22; i++) {
-      wood.fillStyle(i % 2 === 0 ? 0x1A0A03 : 0x160802, 1);
-      wood.fillRect(i * 50, 0, 50, h);
-      wood.lineStyle(1, 0x0A0401, 0.8);
-      wood.lineBetween(i * 50, 0, i * 50, h);
+    // Lancer la scène de fond en parallèle
+    if (!this.scene.isActive('OceanBackgroundScene')) {
+      this.scene.launch('OceanBackgroundScene');
     }
-    const gl = this.add.graphics();
-    [[160, h*0.4], [w-160, h*0.45]].forEach(([lx, ly]) => {
-      for (let r = 220; r > 0; r -= 10) {
-        gl.fillStyle(0xC47008, 0.0045);
-        gl.fillCircle(lx, ly, r);
-      }
-    });
+    this.scene.sendToBack('OceanBackgroundScene');
+    this.renderUI();
   }
 
   private cleanup(): void {
@@ -58,17 +39,17 @@ export class LoginScene extends Phaser.Scene {
 
     const scene = document.createElement('div');
     scene.className = 'op-login-scene';
+    // Fond transparent pour laisser le canvas visible
+    scene.style.background = 'transparent';
 
     const poster = document.createElement('div');
     poster.className = 'op-wanted-poster';
 
-    // Filigrane MARINE
     const wm = document.createElement('div');
     wm.className = 'op-poster-watermark';
     wm.textContent = 'MARINE';
     poster.appendChild(wm);
 
-    // En-tête
     const header = document.createElement('div');
     header.className = 'op-poster-header';
     header.innerHTML = `
@@ -78,7 +59,6 @@ export class LoginScene extends Phaser.Scene {
     `;
     poster.appendChild(header);
 
-    // Tabs
     const tabs = document.createElement('div');
     tabs.className = 'op-poster-tabs';
     const tabLogin = document.createElement('button');
@@ -88,7 +68,7 @@ export class LoginScene extends Phaser.Scene {
     tabReg.className = `op-poster-tab ${isReg ? 'active' : ''}`;
     tabReg.textContent = 'S\'INSCRIRE';
     tabLogin.onclick = () => { this.mode = 'login'; this.renderUI(); };
-    tabReg.onclick  = () => { this.mode = 'register'; this.renderUI(); };
+    tabReg.onclick   = () => { this.mode = 'register'; this.renderUI(); };
     tabs.appendChild(tabLogin);
     tabs.appendChild(tabReg);
     poster.appendChild(tabs);
@@ -100,17 +80,14 @@ export class LoginScene extends Phaser.Scene {
       label.className = 'op-poster-label';
       label.textContent = lbl;
       const input = document.createElement('input');
-      input.type = type;
-      input.placeholder = ph;
-      input.className = 'op-poster-input';
-      wrap.appendChild(label);
-      wrap.appendChild(input);
+      input.type = type; input.placeholder = ph; input.className = 'op-poster-input';
+      wrap.appendChild(label); wrap.appendChild(input);
       return [wrap, input];
     };
 
     const [emailWrap, emailInput] = mkField('ADRESSE DE CONTACT', 'email', 'votre email...');
-    const [userWrap, userInput]   = mkField('NOM DE PIRATE', 'text', 'ex : chapeau_de_paille');
-    const [passWrap, passInput]   = mkField('MOT DE PASSE SECRET', 'password', '••••••••');
+    const [userWrap,  userInput]  = mkField('NOM DE PIRATE', 'text', 'ex : chapeau_de_paille');
+    const [passWrap,  passInput]  = mkField('MOT DE PASSE SECRET', 'password', '••••••••');
 
     poster.appendChild(emailWrap);
     if (isReg) poster.appendChild(userWrap);
@@ -140,8 +117,7 @@ export class LoginScene extends Phaser.Scene {
     goog.href = `${SERVER_URL}/auth/google`;
     goog.className = 'op-poster-oauth-btn op-oauth-google';
     goog.textContent = '🔍 Google';
-    oauthRow.appendChild(disc);
-    oauthRow.appendChild(goog);
+    oauthRow.appendChild(disc); oauthRow.appendChild(goog);
     poster.appendChild(oauthRow);
 
     scene.appendChild(poster);
