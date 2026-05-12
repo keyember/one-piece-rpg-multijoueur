@@ -28,34 +28,23 @@ export class LoginScene extends Phaser.Scene {
     const w = this.cameras.main.width;
     const h = this.cameras.main.height;
     const g = this.add.graphics();
-
-    // Taverne sombre
     g.fillGradientStyle(0x0E0804, 0x0E0804, 0x1A0D04, 0x1A0D04, 1);
     g.fillRect(0, 0, w, h);
 
-    // Planches de bois verticales en fond
     const wood = this.add.graphics();
-    for (let i = 0; i < 20; i++) {
-      wood.fillStyle(i % 2 === 0 ? 0x1A0A03 : 0x150802, 1);
-      wood.fillRect(i * 52, 0, 52, h);
+    for (let i = 0; i < 22; i++) {
+      wood.fillStyle(i % 2 === 0 ? 0x1A0A03 : 0x160802, 1);
+      wood.fillRect(i * 50, 0, 50, h);
       wood.lineStyle(1, 0x0A0401, 0.8);
-      wood.lineBetween(i * 52, 0, i * 52, h);
+      wood.lineBetween(i * 50, 0, i * 50, h);
     }
-
-    // Lumière bougie à gauche
-    const light1 = this.add.graphics();
-    light1.fillStyle(0xD4820A, 0);
-    for (let r = 180; r > 0; r -= 8) {
-      light1.fillStyle(0xD4820A, 0.006);
-      light1.fillCircle(180, h * 0.4, r);
-    }
-
-    // Lumière bougie à droite
-    const light2 = this.add.graphics();
-    for (let r = 150; r > 0; r -= 8) {
-      light2.fillStyle(0xD4820A, 0.005);
-      light2.fillCircle(w - 160, h * 0.5, r);
-    }
+    const gl = this.add.graphics();
+    [[160, h*0.4], [w-160, h*0.45]].forEach(([lx, ly]) => {
+      for (let r = 220; r > 0; r -= 10) {
+        gl.fillStyle(0xC47008, 0.0045);
+        gl.fillCircle(lx, ly, r);
+      }
+    });
   }
 
   private cleanup(): void {
@@ -73,103 +62,86 @@ export class LoginScene extends Phaser.Scene {
     const poster = document.createElement('div');
     poster.className = 'op-wanted-poster';
 
-    // Tampon filigrane
-    const stamp = document.createElement('div');
-    stamp.className = 'op-stamp';
-    stamp.textContent = 'MARINE';
-    poster.appendChild(stamp);
+    // Filigrane MARINE
+    const wm = document.createElement('div');
+    wm.className = 'op-poster-watermark';
+    wm.textContent = 'MARINE';
+    poster.appendChild(wm);
 
     // En-tête
-    poster.innerHTML += `
-      <div class="op-poster-header">
-        <span class="op-poster-authority">⚓ GOUVERNEMENT MONDIAL • MARINE HQ – G.L. • ⚓</span>
-        <span class="op-poster-wanted">WANTED</span>
-        <span class="op-poster-dead-alive">— DEAD OR ALIVE —</span>
-      </div>
+    const header = document.createElement('div');
+    header.className = 'op-poster-header';
+    header.innerHTML = `
+      <span class="op-poster-authority">⚓ GOUVERNEMENT MONDIAL • MARINE HQ • GRAND LINE ⚓</span>
+      <span class="op-poster-wanted">RECHERCHÉ</span>
+      <span class="op-poster-dead-alive">— MORT OU VIF —</span>
     `;
-    poster.appendChild(stamp);
-
-    // Zone photo silhouette
-    const photo = document.createElement('div');
-    photo.className = 'op-poster-photo';
-    photo.innerHTML = `<div class="op-poster-photo-inner">${isReg ? 'IDENTITY\nUNKNOWN' : 'IDENTIFY\nYOURSELF'}</div>`;
-    poster.appendChild(photo);
+    poster.appendChild(header);
 
     // Tabs
     const tabs = document.createElement('div');
     tabs.className = 'op-poster-tabs';
-    const tabConn = document.createElement('button');
-    tabConn.className = `op-poster-tab ${!isReg ? 'active' : ''}`;
-    tabConn.textContent = 'IDENTIFY';
+    const tabLogin = document.createElement('button');
+    tabLogin.className = `op-poster-tab ${!isReg ? 'active' : ''}`;
+    tabLogin.textContent = 'S\'IDENTIFIER';
     const tabReg = document.createElement('button');
     tabReg.className = `op-poster-tab ${isReg ? 'active' : ''}`;
-    tabReg.textContent = 'ENLIST';
-    tabConn.onclick = () => { this.mode = 'login'; this.renderUI(); };
-    tabReg.onclick = () => { this.mode = 'register'; this.renderUI(); };
-    tabs.appendChild(tabConn);
+    tabReg.textContent = 'S\'INSCRIRE';
+    tabLogin.onclick = () => { this.mode = 'login'; this.renderUI(); };
+    tabReg.onclick  = () => { this.mode = 'register'; this.renderUI(); };
+    tabs.appendChild(tabLogin);
     tabs.appendChild(tabReg);
     poster.appendChild(tabs);
 
-    const mkField = (labelTxt: string, type: string, placeholder: string): [HTMLDivElement, HTMLInputElement] => {
-      const field = document.createElement('div');
-      field.className = 'op-poster-field';
+    const mkField = (lbl: string, type: string, ph: string): [HTMLDivElement, HTMLInputElement] => {
+      const wrap = document.createElement('div');
+      wrap.className = 'op-poster-field';
       const label = document.createElement('label');
       label.className = 'op-poster-label';
-      label.textContent = labelTxt;
+      label.textContent = lbl;
       const input = document.createElement('input');
       input.type = type;
-      input.placeholder = placeholder;
+      input.placeholder = ph;
       input.className = 'op-poster-input';
-      field.appendChild(label);
-      field.appendChild(input);
-      return [field, input];
+      wrap.appendChild(label);
+      wrap.appendChild(input);
+      return [wrap, input];
     };
 
-    const [emailField, emailInput] = mkField('IDENTIFIANT (EMAIL)', 'email', 'votre email...');
-    const [userField, userInput] = mkField('NOM DE PIRATE', 'text', 'ex: chapeau_de_paille');
-    const [passField, passInput] = mkField('MOT DE PASSE SECRET', 'password', '••••••••');
+    const [emailWrap, emailInput] = mkField('ADRESSE DE CONTACT', 'email', 'votre email...');
+    const [userWrap, userInput]   = mkField('NOM DE PIRATE', 'text', 'ex : chapeau_de_paille');
+    const [passWrap, passInput]   = mkField('MOT DE PASSE SECRET', 'password', '••••••••');
 
-    poster.appendChild(emailField);
-    if (isReg) poster.appendChild(userField);
-    poster.appendChild(passField);
+    poster.appendChild(emailWrap);
+    if (isReg) poster.appendChild(userWrap);
+    poster.appendChild(passWrap);
 
-    // Bounty
-    const bountyWrap = document.createElement('div');
-    bountyWrap.innerHTML = `
-      <div class="op-poster-bounty-label">PRIME</div>
-      <div class="op-poster-bounty-amount">0 <span class="op-poster-bounty-unit">Berry</span></div>
-    `;
-    poster.appendChild(bountyWrap);
-
-    // Erreur
     const errorDiv = document.createElement('div');
     errorDiv.className = 'op-poster-error';
     poster.appendChild(errorDiv);
 
-    // Bouton
     const btn = document.createElement('button');
     btn.className = 'op-poster-btn';
-    btn.textContent = isReg ? 'S\'ENRÔLER !' : 'CONFIRMER L\'IDENTITÉ';
+    btn.textContent = isReg ? 'S\'ENRÔLER !' : 'CONFIRMER';
     poster.appendChild(btn);
 
-    // OAuth
-    const div = document.createElement('div');
-    div.className = 'op-poster-divider';
-    div.textContent = 'ou via Den Den Mushi';
-    poster.appendChild(div);
+    const sep = document.createElement('div');
+    sep.className = 'op-poster-divider';
+    sep.textContent = 'ou via Den Den Mushi';
+    poster.appendChild(sep);
 
     const oauthRow = document.createElement('div');
     oauthRow.className = 'op-poster-oauth';
-    const discord = document.createElement('a');
-    discord.href = `${SERVER_URL}/auth/discord`;
-    discord.className = 'op-poster-oauth-btn op-oauth-discord';
-    discord.textContent = '🎮 DISCORD';
-    const google = document.createElement('a');
-    google.href = `${SERVER_URL}/auth/google`;
-    google.className = 'op-poster-oauth-btn op-oauth-google';
-    google.textContent = '🔍 GOOGLE';
-    oauthRow.appendChild(discord);
-    oauthRow.appendChild(google);
+    const disc = document.createElement('a');
+    disc.href = `${SERVER_URL}/auth/discord`;
+    disc.className = 'op-poster-oauth-btn op-oauth-discord';
+    disc.textContent = '🎮 Discord';
+    const goog = document.createElement('a');
+    goog.href = `${SERVER_URL}/auth/google`;
+    goog.className = 'op-poster-oauth-btn op-oauth-google';
+    goog.textContent = '🔍 Google';
+    oauthRow.appendChild(disc);
+    oauthRow.appendChild(goog);
     poster.appendChild(oauthRow);
 
     scene.appendChild(poster);
@@ -190,7 +162,7 @@ export class LoginScene extends Phaser.Scene {
       } catch (e: any) {
         errorDiv.textContent = e.message ?? 'Erreur inconnue';
         btn.disabled = false;
-        btn.textContent = isReg ? 'S\'ENRÔLER !' : 'CONFIRMER L\'IDENTITÉ';
+        btn.textContent = isReg ? 'S\'ENRÔLER !' : 'CONFIRMER';
       }
     };
 
