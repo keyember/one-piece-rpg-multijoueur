@@ -2,12 +2,21 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import passport from 'passport';
 import { GameManager } from './game/GameManager';
 import { registerSocketHandlers } from './socket/handlers';
+import { applySocketAuth } from './socket/socketAuth';
+import { authRouter } from './auth/routes';
+import { oauthRouter } from './auth/oauth';
 
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 if (!CLIENT_ORIGIN) {
   console.error('[FATAL] CLIENT_ORIGIN env variable is not set. Exiting.');
+  process.exit(1);
+}
+if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
+  console.error('[FATAL] JWT_SECRET or JWT_REFRESH_SECRET is not set. Exiting.');
   process.exit(1);
 }
 
@@ -20,23 +29,28 @@ const io = new Server(httpServer, {
     methods: ['GET', 'POST'],
     credentials: true,
   },
-  // Limiter la taille des payloads Socket.io
-  maxHttpBufferSize: 1e4, // 10 KB max par message
+  maxHttpBufferSize: 1e4,
 });
 
-// CORS Express également strict
 app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }));
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
+app.use(passport.initialize());
+
+// Routes auth
+app.use('/auth', authRouter);
+app.use('/auth', oauthRouter);
+
+app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+
+// Socket.io : auth obligatoire au handshake
+applySocketAuth(io);
 
 const gameManager = new GameManager();
 
-// Health check interne uniquement (pas de données sensibles)
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok' });
-});
-
 io.on('connection', (socket) => {
-  console.log(`[Socket] Connexion : ${socket.id}`);
+  const user = (socket as any).user;
+  console.log(`[Socket] Connexion : ${user.username} (${socket.id})`);
   registerSocketHandlers(io, socket, gameManager);
 });
 

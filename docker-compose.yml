@@ -5,20 +5,42 @@ networks:
     internal: true
 
 services:
+  db:
+    image: postgres:16-alpine
+    networks:
+      - rpg-internal
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
   server:
     build:
-      context: .        # racine du repo = shared/ accessible
+      context: .
       dockerfile: server/Dockerfile
     networks:
       - rpg-internal
     environment:
       - NODE_ENV=production
       - CLIENT_ORIGIN=${CLIENT_ORIGIN}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+      - DISCORD_CLIENT_SECRET=${DISCORD_CLIENT_SECRET}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    depends_on:
+      - db
     restart: unless-stopped
 
   client:
     build:
-      context: .        # racine du repo = shared/ accessible
+      context: .
       dockerfile: client/Dockerfile
       args:
         - VITE_SERVER_URL=${CLIENT_ORIGIN}
@@ -27,3 +49,6 @@ services:
     depends_on:
       - server
     restart: unless-stopped
+
+volumes:
+  postgres_data:
