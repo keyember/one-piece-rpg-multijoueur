@@ -12,7 +12,6 @@ export class OceanBackgroundScene extends Phaser.Scene {
 
   private stars: { x: number; y: number; size: number; baseAlpha: number; phase: number; speed: number }[] = [];
   private glowTime = 0;
-  private seaTime = 0;
   private shootingStars: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
   private shootingTimer = 0;
   private shipBob = 0;
@@ -41,6 +40,7 @@ export class OceanBackgroundScene extends Phaser.Scene {
     sky.fillGradientStyle(0x01030A, 0x01030A, 0x05101E, 0x05101E, 1);
     sky.fillRect(0, 0, W, HORIZON + 2);
 
+    // Mer de base unie — les vagues polygon se dessinent par-dessus
     const sea = this.add.graphics();
     sea.fillGradientStyle(0x06192E, 0x06192E, 0x010608, 0x010608, 1);
     sea.fillRect(0, HORIZON, W, H - HORIZON);
@@ -90,7 +90,7 @@ export class OceanBackgroundScene extends Phaser.Scene {
   }
 
   private drawIslands(): void {
-    const { W, H, HORIZON } = this;  // H inclus
+    const { W, H, HORIZON } = this;
     const g = this.add.graphics();
     const BASE = HORIZON - 18;
 
@@ -152,60 +152,68 @@ export class OceanBackgroundScene extends Phaser.Scene {
     }
   }
 
+  // Calcule la hauteur de la vague en x au temps t
+  private waveY(x: number, t: number): number {
+    return Math.sin(x * 0.018 + t * 1.4)         * 5
+         + Math.sin(x * 0.045 + t * 2.1 + 1.2)   * 2.5
+         + Math.sin(x * 0.09  + t * 3.0 + 2.4)   * 1.2;
+  }
+
   private drawSea(time: number): void {
     const { W, H, HORIZON } = this;
     const g = this.seaGraphics;
     g.clear();
     const t = time * 0.001;
+    const step = 8; // pas horizontal — assez fin pour la courbe, pas de lignes visibles
 
-    for (let x = 0; x < W; x += 3) {
-      const wave =
-        Math.sin(x * 0.018 + t * 1.4)         * 5
-        + Math.sin(x * 0.045 + t * 2.1 + 1.2) * 2.5
-        + Math.sin(x * 0.09  + t * 3.0 + 2.4) * 1.2;
-      const surfaceY = HORIZON + wave;
-      const lightness = Math.max(0, -wave / 8);
-      const color = Phaser.Display.Color.Interpolate.ColorWithColor(
-        { r: 6,  g: 25, b: 46,  a: 255 },
-        { r: 20, g: 60, b: 100, a: 255 },
-        100,
-        Math.floor(lightness * 100)
-      );
-      g.fillStyle(Phaser.Display.Color.GetColor(color.r, color.g, color.b), 0.85);
-      g.fillRect(x, surfaceY, 3, H - surfaceY);
+    // ── 1. Corps de la mer : un seul polygon continu ──────────────────────────
+    // Points : bord gauche bas → surface (gauche→droite) → bord droit bas
+    const pts: Phaser.Math.Vector2[] = [];
+    pts.push(new Phaser.Math.Vector2(0, H));           // coin bas-gauche
+    for (let x = 0; x <= W; x += step) {
+      pts.push(new Phaser.Math.Vector2(x, HORIZON + this.waveY(x, t)));
     }
+    pts.push(new Phaser.Math.Vector2(W, H));           // coin bas-droit
 
-    g.lineStyle(1, 0x4A9CC0, 0.25);
+    g.fillStyle(0x0D3352, 1);
+    g.fillPoints(pts, true);
+
+    // ── 2. Couche plus sombre en profondeur (second polygon décalé) ────────────
+    const pts2: Phaser.Math.Vector2[] = [];
+    pts2.push(new Phaser.Math.Vector2(0, H));
+    for (let x = 0; x <= W; x += step) {
+      pts2.push(new Phaser.Math.Vector2(x, HORIZON + this.waveY(x, t) + 18));
+    }
+    pts2.push(new Phaser.Math.Vector2(W, H));
+    g.fillStyle(0x061828, 0.7);
+    g.fillPoints(pts2, true);
+
+    // ── 3. Ligne de surface lumineuse ─────────────────────────────────────────
+    g.lineStyle(1.5, 0x5AB8D8, 0.3);
     g.beginPath();
-    for (let x = 0; x <= W; x += 4) {
-      const wave =
-        Math.sin(x * 0.018 + t * 1.4)         * 5
-        + Math.sin(x * 0.045 + t * 2.1 + 1.2) * 2.5
-        + Math.sin(x * 0.09  + t * 3.0 + 2.4) * 1.2;
-      x === 0 ? g.moveTo(x, HORIZON + wave) : g.lineTo(x, HORIZON + wave);
+    for (let x = 0; x <= W; x += step) {
+      const y = HORIZON + this.waveY(x, t);
+      x === 0 ? g.moveTo(x, y) : g.lineTo(x, y);
     }
     g.strokePath();
 
-    for (let x = 0; x < W; x += 6) {
-      const wave1 = Math.sin(x * 0.018 + t * 1.4) * 5;
-      if (wave1 < -3.5) {
-        g.fillStyle(0xCCEEFF, 0.08 + ((-wave1 - 3.5) / 1.5) * 0.12);
-        g.fillRect(x, HORIZON + wave1, 5, 1);
+    // ── 4. Écume sur les crêtes ─────────────────────────────────────────────
+    for (let x = 0; x < W; x += step) {
+      const w = this.waveY(x, t);
+      if (w < -3.5) {
+        g.fillStyle(0xCCEEFF, 0.07 + ((-w - 3.5) / 1.5) * 0.1);
+        g.fillRect(x, HORIZON + w, step, 1);
       }
     }
 
-    for (let i = 0; i < 18; i++) {
-      const rx = (W * 0.3 + i * 38 + Math.sin(t * 0.7 + i) * 20) % W;
-      const ry = HORIZON + 15 + i * 9 + Math.sin(t * 1.2 + i * 0.5) * 4;
-      if (ry < H) {
-        g.fillStyle(0xAADDFF, 0.04 + Math.sin(t * 2 + i) * 0.02);
-        g.fillRect(rx, ry, 10 + i, 1);
+    // ── 5. Reflets lumineux (shimmer) ───────────────────────────────────────
+    for (let i = 0; i < 14; i++) {
+      const rx = (W * 0.25 + i * 52 + Math.sin(t * 0.7 + i) * 24) % W;
+      const ry = HORIZON + 20 + i * 10 + Math.sin(t * 1.1 + i * 0.6) * 5;
+      if (ry < H - 10) {
+        g.fillStyle(0x88CCEE, 0.035 + Math.abs(Math.sin(t * 1.8 + i)) * 0.025);
+        g.fillRect(rx, ry, 14 + i * 2, 1);
       }
-    }
-
-    for (let i = 0; i < 30; i++) {
-      g.fillStyle(0x000000, 0.018);
-      g.fillRect(0, H - 30 + i, W, 1);
     }
   }
 
@@ -271,7 +279,6 @@ export class OceanBackgroundScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number): void {
-    this.seaTime  += delta;
     this.glowTime += delta * 0.001;
     this.shipBob   = Math.sin(time * 0.0012) * 2.5;
 
