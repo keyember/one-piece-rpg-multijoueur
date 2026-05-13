@@ -17,6 +17,13 @@ const COOKIE_OPTIONS = {
   path: '/auth/refresh',
 };
 
+console.log('[OAuth] GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? 'OK' : 'UNDEFINED');
+console.log('[OAuth] GOOGLE_CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET ? 'OK' : 'UNDEFINED');
+console.log('[OAuth] GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL ?? 'UNDEFINED');
+console.log('[OAuth] DISCORD_CLIENT_ID:', process.env.DISCORD_CLIENT_ID ? 'OK' : 'UNDEFINED');
+console.log('[OAuth] DISCORD_CLIENT_SECRET:', process.env.DISCORD_CLIENT_SECRET ? 'OK' : 'UNDEFINED');
+console.log('[OAuth] DISCORD_CALLBACK_URL:', process.env.DISCORD_CALLBACK_URL ?? 'UNDEFINED');
+
 async function findOrCreateOAuthUser(
   provider: string,
   providerId: string,
