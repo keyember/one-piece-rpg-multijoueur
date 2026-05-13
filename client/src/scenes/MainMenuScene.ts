@@ -39,19 +39,18 @@ export class MainMenuScene extends Phaser.Scene {
       board.appendChild(n);
     });
 
-    // Parchemin épinglé
+    // Post-it — en dehors du board, positionné en haut à droite de la scène
     const note = document.createElement('div');
     note.className = 'op-pinned-note';
     note.innerHTML = '<div class="op-pin"></div>Menu du jour :<br>Soupe de mer<br>+ Rhum du pays';
-    board.appendChild(note);
+    scene.appendChild(note);
 
     // Titre
     const titleDiv = document.createElement('div');
     titleDiv.className = 'op-board-title';
     titleDiv.innerHTML = `
-      <span class="op-board-title-main">🏴‍☠️ ONE PIECE</span>
-      <span class="op-board-ornament">⚔ · ⚓ · ⚔</span>
-      <span class="op-board-title-sub">GRAND LINE ONLINE — RPG MULTIJOUEUR</span>
+      <span class="op-board-title-main">GRAND LINE ONLINE</span>
+      <span class="op-board-title-sub">RPG MULTIJOUEUR — GRAND LINE</span>
     `;
     board.appendChild(titleDiv);
 
