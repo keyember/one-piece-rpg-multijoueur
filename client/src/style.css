@@ -17,13 +17,40 @@
 }
 
 body {
-  background: var(--wood-dark);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
+  /* Ciel nocturne en CSS pur — aucun artefact WebGL */
+  background: linear-gradient(to bottom, #010208 0%, #020918 55%, #03091A 100%);
   font-family: 'IM Fell English', Georgia, serif;
+}
+
+#game-container {
+  position: fixed;
+  inset: 0;
+}
+
+#game-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Lune en CSS positionnée en haut-droite */
+#css-moon {
+  position: fixed;
+  top: 8vh;
+  right: 17vw;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #EDE3BB;
+  box-shadow:
+    -11px -9px 0 0 #020918,   /* masque pour faire le croissant */
+    0 0 18px 6px rgba(220,210,150,0.18),
+    0 0 40px 12px rgba(200,185,100,0.08);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ==================== WANTED POSTER LOGIN ==================== */
@@ -34,22 +61,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background:
-    radial-gradient(ellipse at 30% 40%, rgba(90,40,5,0.6) 0%, transparent 60%),
-    radial-gradient(ellipse at 70% 60%, rgba(27,58,107,0.25) 0%, transparent 50%),
-    #0E0804;
   z-index: 10;
-}
-
-/* Texture bois */
-.op-login-scene::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(92deg, transparent, transparent 40px, rgba(255,255,255,0.012) 40px, rgba(255,255,255,0.012) 41px),
-    repeating-linear-gradient(178deg, transparent, transparent 8px, rgba(0,0,0,0.08) 8px, rgba(0,0,0,0.08) 9px);
-  pointer-events: none;
 }
 
 .op-wanted-poster {
@@ -66,7 +78,6 @@ body {
   position: relative;
 }
 
-/* Vieillissement du parchemin */
 .op-wanted-poster::before {
   content: '';
   position: absolute;
@@ -78,7 +89,6 @@ body {
   pointer-events: none;
 }
 
-/* Filigrane MARINE en diagonale */
 .op-poster-watermark {
   position: absolute;
   top: 50%;
@@ -94,7 +104,6 @@ body {
   user-select: none;
 }
 
-/* En-tête officielle */
 .op-poster-header {
   text-align: center;
   padding-bottom: 12px;
@@ -133,7 +142,6 @@ body {
   margin-top: 4px;
 }
 
-/* Tabs */
 .op-poster-tabs {
   display: flex;
   margin-bottom: 16px;
@@ -167,7 +175,6 @@ body {
   opacity: 0.9;
 }
 
-/* Champs */
 .op-poster-field { margin-bottom: 12px; }
 
 .op-poster-label {
@@ -205,7 +212,6 @@ body {
   border-bottom-color: var(--marine-red);
 }
 
-/* Erreur */
 .op-poster-error {
   color: var(--marine-red);
   font-family: 'Cinzel', serif;
@@ -217,7 +223,6 @@ body {
   margin: 6px 0;
 }
 
-/* Bouton principal */
 .op-poster-btn {
   width: 100%;
   margin-top: 4px;
@@ -239,7 +244,6 @@ body {
 .op-poster-btn:active { transform: translateY(3px); box-shadow: none; }
 .op-poster-btn:disabled { filter: grayscale(0.5) brightness(0.7); cursor: not-allowed; }
 
-/* Séparateur */
 .op-poster-divider {
   display: flex;
   align-items: center;
@@ -260,7 +264,6 @@ body {
   opacity: 0.5;
 }
 
-/* OAuth */
 .op-poster-oauth { display: flex; gap: 8px; }
 
 .op-poster-oauth-btn {
@@ -456,7 +459,6 @@ body {
   text-align: right;
 }
 
-/* Modal parchemin */
 .op-modal-bg {
   position: absolute;
   inset: 0;

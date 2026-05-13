@@ -23,9 +23,10 @@ export class OceanBackgroundScene extends Phaser.Scene {
     this.H = this.cameras.main.height;
     this.HORIZON = Math.floor(this.H * 0.62);
 
-    this.drawStaticBg();
+    // Le ciel est en CSS — on ne dessine ici que la mer, les étoiles, les îles
     this.initStars();
     this.drawIslands();
+    this.drawMoonReflect();
 
     this.glowGraphics = this.add.graphics();
     this.seaGraphics  = this.add.graphics();
@@ -33,36 +34,9 @@ export class OceanBackgroundScene extends Phaser.Scene {
     this.starGraphics = this.add.graphics();
   }
 
-  private drawStaticBg(): void {
-    const { W, H, HORIZON } = this;
+  private drawMoonReflect(): void {
+    const { W, HORIZON } = this;
     const g = this.add.graphics();
-
-    // Ciel : dégradé simulé par bandes horizontales fines — aucun triangle WebGL
-    const skyTop    = 0x010208;
-    const skyBottom = 0x03091A;
-    const steps = 60;
-    for (let i = 0; i < steps; i++) {
-      const ratio = i / steps;
-      const r = Math.round(((skyTop >> 16) & 0xff) * (1 - ratio) + ((skyBottom >> 16) & 0xff) * ratio);
-      const gr = Math.round(((skyTop >> 8)  & 0xff) * (1 - ratio) + ((skyBottom >> 8)  & 0xff) * ratio);
-      const b  = Math.round(( skyTop        & 0xff) * (1 - ratio) + ( skyBottom        & 0xff) * ratio);
-      g.fillStyle((r << 16) | (gr << 8) | b, 1);
-      const y0 = Math.floor(i * HORIZON / steps);
-      const y1 = Math.floor((i + 1) * HORIZON / steps);
-      g.fillRect(0, y0, W, y1 - y0 + 1);
-    }
-
-    // Lune croissant
-    g.fillStyle(0xEDE3BB, 0.92);
-    g.fillCircle(W * 0.76, H * 0.13, 28);
-    g.fillStyle(0x010208, 1);
-    g.fillCircle(W * 0.76 + 11, H * 0.13 - 9, 23);
-    for (let r = 70; r > 28; r -= 3) {
-      g.fillStyle(0xD8CC98, 0.004);
-      g.fillCircle(W * 0.76, H * 0.13, r);
-    }
-
-    // Reflet lune
     for (let i = 0; i < 32; i++) {
       const a = (0.022 - i * 0.0006) * Math.max(0, 1 - i / 32);
       g.fillStyle(0xC8B870, a);
