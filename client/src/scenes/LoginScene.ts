@@ -42,29 +42,36 @@ export class LoginScene extends Phaser.Scene {
     const card = document.createElement('div');
     card.className = 'op-nav-card';
 
-    // Coins supplémentaires haut-droit / bas-gauche
     const corners = document.createElement('div');
     corners.className = 'op-nav-card-corners';
     corners.style.cssText = 'position:absolute;inset:0;pointer-events:none;';
     card.appendChild(corners);
 
-    // Filigrane
     const wm = document.createElement('div');
     wm.className = 'op-nav-watermark';
     wm.textContent = 'MARINE';
     card.appendChild(wm);
 
-    // Header
     const header = document.createElement('div');
     header.className = 'op-nav-header';
+    // Ligne décorative
+    const rule = document.createElement('div');
+    rule.className = 'op-nav-rule';
+    rule.innerHTML = '<div class="op-nav-rule-diamond"></div>';
     header.innerHTML = `
       <span class="op-nav-authority">⚓ GOUVERNEMENT MONDIAL · MARINE HQ · GRAND LINE ⚓</span>
-      <span class="op-nav-title">RECHERCHÉ</span>
-      <span class="op-nav-subtitle">— MORT OU VIF —</span>
     `;
+    header.appendChild(rule);
+    const titleSpan = document.createElement('span');
+    titleSpan.className = 'op-nav-title';
+    titleSpan.textContent = 'RECHERCH\u00c9';
+    header.appendChild(titleSpan);
+    const subtitleSpan = document.createElement('span');
+    subtitleSpan.className = 'op-nav-subtitle';
+    subtitleSpan.textContent = '\u2014 mort ou vif \u2014';
+    header.appendChild(subtitleSpan);
     card.appendChild(header);
 
-    // Tabs
     const tabs = document.createElement('div');
     tabs.className = 'op-nav-tabs';
     const tabLogin = document.createElement('button');
@@ -105,7 +112,7 @@ export class LoginScene extends Phaser.Scene {
 
     const btn = document.createElement('button');
     btn.className = 'op-nav-btn';
-    btn.textContent = isReg ? "S'ENRÔLER !" : 'CONFIRMER';
+    btn.textContent = isReg ? "S'ENRÔLER" : 'CONFIRMER';
     card.appendChild(btn);
 
     const sep = document.createElement('div');
@@ -144,7 +151,7 @@ export class LoginScene extends Phaser.Scene {
       } catch (e: any) {
         errorDiv.textContent = e.message ?? 'Erreur inconnue';
         btn.disabled = false;
-        btn.textContent = isReg ? "S'ENRÔLER !" : 'CONFIRMER';
+        btn.textContent = isReg ? "S'ENRÔLER" : 'CONFIRMER';
       }
     };
 
