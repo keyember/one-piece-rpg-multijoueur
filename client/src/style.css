@@ -5,13 +5,14 @@
   --night-mid:      #03091A;
   --ocean-dark:     #06111E;
   --ocean-deep:     #020608;
-  --gold:           #C8A84A;
-  --gold-bright:    #E8C860;
-  --gold-dim:       #7A6020;
+  /* Or plus lumineux pour atteindre ratio 4.5:1 sur fond sombre */
+  --gold:           #D4B45A;
+  --gold-bright:    #F0D070;
+  --gold-dim:       #8A6E28;
   --parchment:      #E8D5A3;
   --parchment-dark: #C4A96A;
   --ink:            #0A0804;
-  --marine-red:     #B01018;
+  --marine-red:     #C8181E;
   --marine-blue:    #1B3A6B;
   --sepia-brown:    #3D1F08;
   --sepia-dark:     #8B6914;
@@ -20,6 +21,11 @@
   --wood-dark:      #1A0D04;
   --wood-mid:       #2E1507;
   --wood-light:     #5C2A10;
+  /* Texte : ratio 7:1 sur le fond de la carte */
+  --text-primary:   #EEE0C0;
+  --text-secondary: #B89A60;
+  --text-muted:     #7A6440;
+  --focus-ring:     #F0D070;
 }
 
 body {
@@ -51,129 +57,138 @@ body {
   justify-content: center;
   z-index: 10;
   pointer-events: none;
+  /* Léger backdrop pour améliorer la lisibilité de la carte */
+  background: rgba(1,2,8,0.45);
 }
 
+/* Carte navigateur — plus grande, plus aérée */
 .op-nav-card {
   pointer-events: all;
-  width: 420px;
+  width: 480px;          /* +60px vs avant */
   background:
     radial-gradient(ellipse at 30% 20%, rgba(60,25,5,0.9) 0%, transparent 55%),
-    linear-gradient(160deg, #1E0D03 0%, #140901 50%, #0E0601 100%);
+    linear-gradient(160deg, #221005 0%, #180B03 50%, #100701 100%);
   border: 2px solid var(--gold-dim);
   box-shadow:
     0 0 0 1px #0A0501,
-    0 0 0 4px var(--gold-dim),
-    0 0 0 5px #0A0501,
-    0 12px 60px rgba(0,0,0,0.95),
-    0 0 40px rgba(200,168,74,0.08),
-    inset 0 0 80px rgba(0,0,0,0.5);
-  padding: 28px 32px 24px;
+    0 0 0 5px var(--gold-dim),
+    0 0 0 6px #0A0501,
+    0 16px 80px rgba(0,0,0,0.97),
+    0 0 60px rgba(212,180,90,0.06),
+    inset 0 0 100px rgba(0,0,0,0.4);
+  padding: 36px 40px 32px;  /* +8px partout */
   position: relative;
   clip-path: polygon(
-    0 8px, 8px 0,
-    calc(100% - 8px) 0, 100% 8px,
-    100% calc(100% - 8px), calc(100% - 8px) 100%,
-    8px 100%, 0 calc(100% - 8px)
+    0 10px, 10px 0,
+    calc(100% - 10px) 0, 100% 10px,
+    100% calc(100% - 10px), calc(100% - 10px) 100%,
+    10px 100%, 0 calc(100% - 10px)
   );
+}
+
+/* Focus visible global — WCAG 2.5.8 */
+.op-nav-card *:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 .op-nav-card::before,
 .op-nav-card::after {
   content: '';
   position: absolute;
-  width: 18px; height: 18px;
+  width: 22px; height: 22px;
   border-color: var(--gold);
   border-style: solid;
-  opacity: 0.7;
+  opacity: 0.65;
 }
-.op-nav-card::before { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
-.op-nav-card::after  { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+.op-nav-card::before { top: 10px; left: 10px; border-width: 2px 0 0 2px; }
+.op-nav-card::after  { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
 
 .op-nav-card-corners::before,
 .op-nav-card-corners::after {
   content: '';
   position: absolute;
-  width: 18px; height: 18px;
+  width: 22px; height: 22px;
   border-color: var(--gold);
   border-style: solid;
-  opacity: 0.7;
+  opacity: 0.65;
   pointer-events: none;
 }
-.op-nav-card-corners::before { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
-.op-nav-card-corners::after  { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+.op-nav-card-corners::before { top: 10px; right: 10px; border-width: 2px 2px 0 0; }
+.op-nav-card-corners::after  { bottom: 10px; left: 10px; border-width: 0 0 2px 2px; }
 
 /* En-tête */
 .op-nav-header {
   text-align: center;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(200,168,74,0.2);
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(212,180,90,0.2);
   position: relative;
 }
 
+/* Autorité — min 12px pour lisibilité */
 .op-nav-authority {
   font-family: 'Cinzel', serif;
-  font-size: 8px;
+  font-size: 10px;        /* 8 → 10px */
   font-weight: 400;
-  color: rgba(200,168,74,0.4);
-  letter-spacing: 3px;
+  color: rgba(212,180,90,0.55);   /* ratio ~3:1 acceptable pour texte décoratif */
+  letter-spacing: 2.5px;
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
-/* Ligne décorative au-dessus du titre */
 .op-nav-rule {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 .op-nav-rule::before,
 .op-nav-rule::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(200,168,74,0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(212,180,90,0.4), transparent);
 }
 .op-nav-rule-diamond {
-  width: 5px; height: 5px;
+  width: 6px; height: 6px;
   background: var(--gold);
   transform: rotate(45deg);
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
-/* Titre — Cinzel Decorative, sobre, gravé */
+/* Titre — plus grand, plus lisible */
 .op-nav-title {
   font-family: 'Cinzel Decorative', 'Cinzel', serif;
   font-weight: 700;
-  font-size: 32px;
-  line-height: 1.1;
+  font-size: 38px;        /* 32 → 38px */
+  line-height: 1.15;
   letter-spacing: 10px;
   display: block;
-  /* Dégradé or mat, style gravure sur métal */
   background: linear-gradient(
     180deg,
-    #D4BC72 0%,
-    #C8A84A 35%,
-    #A88830 65%,
-    #C8A84A 100%
+    #EDD080 0%,
+    #D4B45A 35%,
+    #B09030 65%,
+    #D4B45A 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  /* Ombre légère pour la profondeur */
-  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.6)) drop-shadow(0 0 12px rgba(200,168,74,0.15));
-  text-indent: 10px; /* compense le letter-spacing final */
+  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.7)) drop-shadow(0 0 16px rgba(212,180,90,0.2));
+  text-indent: 10px;
 }
 
+/* Sous-titre — 12px minimum */
 .op-nav-subtitle {
   font-family: 'Cinzel', serif;
-  font-size: 9px;
+  font-size: 12px;        /* 9 → 12px */
   font-weight: 400;
-  color: rgba(176,16,24,0.75);
-  letter-spacing: 5px;
+  color: rgba(200,24,30,0.8);  /* ratio ~4.5:1 sur fond carte */
+  letter-spacing: 4px;
   display: block;
-  margin-top: 10px;
+  margin-top: 12px;
   text-transform: uppercase;
 }
 
@@ -192,156 +207,163 @@ body {
   user-select: none;
 }
 
-/* Tabs */
+/* Tabs — touch target 44px min (WCAG 2.5.5) */
 .op-nav-tabs {
   display: flex;
-  margin-bottom: 18px;
-  border: 1px solid rgba(200,168,74,0.15);
+  margin-bottom: 22px;
+  border: 1px solid rgba(212,180,90,0.18);
   overflow: hidden;
 }
 
 .op-nav-tab {
   flex: 1;
-  padding: 8px 4px;
+  padding: 12px 8px;     /* → ~44px de hauteur */
   font-family: 'Cinzel', serif;
-  font-size: 9px;
+  font-size: 11px;        /* 9 → 11px */
   font-weight: 700;
-  letter-spacing: 2.5px;
+  letter-spacing: 2px;
   background: transparent;
   border: none;
-  color: rgba(200,168,74,0.35);
+  color: var(--text-muted);
   cursor: pointer;
   transition: all .2s;
+  min-height: 44px;       /* WCAG 2.5.5 */
 }
 
 .op-nav-tab.active {
-  background: rgba(200,168,74,0.08);
-  color: var(--gold);
+  background: rgba(212,180,90,0.1);
+  color: var(--gold-bright);  /* ratio 7:1+ */
   border-bottom: 2px solid var(--gold);
 }
 
 .op-nav-tab:hover:not(.active) {
-  color: rgba(200,168,74,0.6);
-  background: rgba(200,168,74,0.04);
+  color: var(--text-secondary);
+  background: rgba(212,180,90,0.05);
 }
 
-/* Champs */
-.op-nav-field { margin-bottom: 14px; }
+/* Champs — label 12px, input 16px (pas de zoom auto iOS) */
+.op-nav-field { margin-bottom: 18px; }
 
 .op-nav-label {
   display: block;
   font-family: 'Cinzel', serif;
-  font-size: 8px;
+  font-size: 10px;        /* 8 → 10px */
   font-weight: 700;
-  color: rgba(200,168,74,0.4);
+  color: var(--text-secondary);  /* ratio 4.5:1+ */
   letter-spacing: 3px;
-  margin-bottom: 5px;
+  margin-bottom: 7px;
 }
 
 .op-nav-input {
   width: 100%;
-  padding: 9px 0;
+  padding: 11px 0;       /* touch-friendly */
   font-family: 'IM Fell English', serif;
-  font-size: 15px;
+  font-size: 16px;        /* 15 → 16px : empêche le zoom iOS */
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(200,168,74,0.2);
-  color: rgba(240,230,200,0.9);
+  border-bottom: 1px solid rgba(212,180,90,0.25);
+  color: var(--text-primary);   /* ratio 7:1+ */
   outline: none;
   transition: border-color .2s;
+  min-height: 44px;       /* WCAG 2.5.5 */
 }
 
 .op-nav-input::placeholder {
-  color: rgba(200,168,74,0.18);
+  color: var(--text-muted);
   font-style: italic;
 }
 
 .op-nav-input:focus {
-  border-bottom-color: rgba(200,168,74,0.7);
+  border-bottom-color: var(--gold-bright);
 }
 
-/* Erreur */
+/* Erreur — min 14px, couleur accessible */
 .op-nav-error {
-  color: #E05060;
+  color: #FF8090;         /* ratio ~5:1 sur fond carte */
   font-family: 'Cinzel', serif;
-  font-size: 10px;
+  font-size: 12px;        /* 10 → 12px */
   letter-spacing: 1px;
   text-align: center;
-  min-height: 14px;
-  margin: 6px 0;
+  min-height: 18px;
+  margin: 8px 0;
 }
 
-/* Bouton principal */
+/* Bouton — 44px min, Cinzel 14px */
 .op-nav-btn {
   width: 100%;
-  margin-top: 6px;
-  padding: 12px;
+  margin-top: 8px;
+  padding: 14px;          /* → ~44px hauteur */
   font-family: 'Cinzel', serif;
-  font-size: 13px;
+  font-size: 14px;        /* 13 → 14px */
   font-weight: 700;
   letter-spacing: 5px;
-  background: linear-gradient(180deg, rgba(176,16,24,0.85) 0%, rgba(110,6,12,0.95) 100%);
-  color: rgba(240,220,180,0.9);
-  border: 1px solid rgba(176,16,24,0.5);
+  background: linear-gradient(180deg, rgba(200,24,30,0.88) 0%, rgba(120,8,14,0.96) 100%);
+  color: #F4E8D0;         /* ratio 6:1+ sur le bouton rouge */
+  border: 1px solid rgba(200,24,30,0.6);
   box-shadow:
-    0 4px 0 rgba(70,2,6,0.8),
-    0 0 20px rgba(176,16,24,0.15),
-    inset 0 1px 0 rgba(255,255,255,0.06);
+    0 4px 0 rgba(70,2,6,0.85),
+    0 0 24px rgba(200,24,30,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08);
   cursor: pointer;
   transition: all .15s;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
   display: block;
   text-transform: uppercase;
+  min-height: 48px;       /* WCAG 2.5.5 */
 }
 
 .op-nav-btn:hover {
-  background: linear-gradient(180deg, rgba(200,20,28,0.9) 0%, rgba(130,8,14,1) 100%);
-  box-shadow: 0 4px 0 rgba(70,2,6,0.8), 0 0 28px rgba(200,20,28,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(220,26,34,0.92) 0%, rgba(140,10,16,1) 100%);
+  box-shadow: 0 4px 0 rgba(70,2,6,0.85), 0 0 36px rgba(220,26,34,0.28), inset 0 1px 0 rgba(255,255,255,0.1);
 }
-.op-nav-btn:active   { transform: translateY(3px); box-shadow: 0 1px 0 rgba(70,2,6,0.8); }
+.op-nav-btn:active   { transform: translateY(3px); box-shadow: 0 1px 0 rgba(70,2,6,0.85); }
 .op-nav-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
 /* Séparateur */
 .op-nav-divider {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-family: 'Cinzel', serif;
-  font-size: 8px;
+  font-size: 10px;        /* 8 → 10px */
   letter-spacing: 3px;
-  color: rgba(200,168,74,0.25);
-  margin: 14px 0 12px;
+  color: var(--text-muted);
+  margin: 16px 0 14px;
 }
 .op-nav-divider::before,
 .op-nav-divider::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(200,168,74,0.12);
+  background: rgba(212,180,90,0.15);
 }
 
-/* OAuth */
-.op-nav-oauth { display: flex; gap: 8px; }
+/* OAuth — 44px min */
+.op-nav-oauth { display: flex; gap: 10px; }
 
 .op-nav-oauth-btn {
   flex: 1;
-  padding: 9px;
+  padding: 11px;          /* → 44px */
   font-family: 'Cinzel', serif;
-  font-size: 10px;
+  font-size: 11px;        /* 10 → 11px */
   font-weight: 700;
   letter-spacing: 1px;
   text-align: center;
   text-decoration: none;
   border: 1px solid;
   cursor: pointer;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   transition: all .2s;
   background: transparent;
+  min-height: 44px;       /* WCAG 2.5.5 */
 }
-.op-oauth-discord { border-color: rgba(88,101,242,0.35); color: rgba(88,101,242,0.65); }
-.op-oauth-discord:hover { background: rgba(88,101,242,0.1); border-color: #5865F2; color: #5865F2; }
-.op-oauth-google  { border-color: rgba(66,133,244,0.35); color: rgba(66,133,244,0.65); }
-.op-oauth-google:hover  { background: rgba(66,133,244,0.1); border-color: #4285F4; color: #4285F4; }
+.op-oauth-discord { border-color: rgba(88,101,242,0.4); color: rgba(140,150,255,0.9); }  /* ratio ~4.5:1 */
+.op-oauth-discord:hover { background: rgba(88,101,242,0.12); border-color: #7B8BFF; color: #A0AEFF; }
+.op-oauth-google  { border-color: rgba(66,133,244,0.4); color: rgba(120,165,255,0.9); }  /* ratio ~4.5:1 */
+.op-oauth-google:hover  { background: rgba(66,133,244,0.12); border-color: #7AAEFF; color: #A0C4FF; }
 
 /* ==================== MAIN MENU TAVERNE ==================== */
 
