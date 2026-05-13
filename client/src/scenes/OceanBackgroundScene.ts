@@ -36,28 +36,28 @@ export class OceanBackgroundScene extends Phaser.Scene {
   private drawStaticBg(): void {
     const { W, H, HORIZON } = this;
 
-    // Ciel
+    // Ciel — dégradé nuit profonde
     const sky = this.add.graphics();
-    sky.fillGradientStyle(0x01030A, 0x01030A, 0x05101E, 0x05101E, 1);
+    sky.fillGradientStyle(0x010208, 0x010208, 0x03091A, 0x03091A, 1);
     sky.fillRect(0, 0, W, HORIZON + 2);
 
-    // PAS de rectangle de mer statique — la mer est entièrement gérée par drawSea()
-
-    // Lune
+    // Lune croissant
     const moon = this.add.graphics();
-    moon.fillStyle(0xEDE3BB, 0.95);
+    moon.fillStyle(0xEDE3BB, 0.92);
     moon.fillCircle(W * 0.76, H * 0.13, 28);
-    moon.fillStyle(0x01030A, 1);
+    moon.fillStyle(0x010208, 1);
     moon.fillCircle(W * 0.76 + 11, H * 0.13 - 9, 23);
-    for (let r = 65; r > 28; r -= 3) {
-      moon.fillStyle(0xDDD0A0, 0.005);
+    for (let r = 70; r > 28; r -= 3) {
+      moon.fillStyle(0xD8CC98, 0.004);
       moon.fillCircle(W * 0.76, H * 0.13, r);
     }
-    // Reflet lune
+
+    // Reflet lune sur mer — bande dorée verticale
     const ref = this.add.graphics();
-    for (let i = 0; i < 30; i++) {
-      ref.fillStyle(0xDDD0A0, 0.013 - i * 0.0004);
-      ref.fillEllipse(W * 0.76, HORIZON + 8 + i * 7, 38 - i * 0.5, 5);
+    for (let i = 0; i < 32; i++) {
+      const a = (0.022 - i * 0.0006) * Math.max(0, 1 - i / 32);
+      ref.fillStyle(0xC8B870, a);
+      ref.fillEllipse(W * 0.76, HORIZON + 6 + i * 8, 22 - i * 0.4, 4);
     }
   }
 
@@ -93,11 +93,11 @@ export class OceanBackgroundScene extends Phaser.Scene {
     const g = this.add.graphics();
     const BASE = HORIZON - 18;
 
-    g.fillStyle(0x020609, 1);
+    g.fillStyle(0x010406, 1);
     g.fillTriangle(W * 0.04, BASE, W * 0.16, BASE - 52, W * 0.28, BASE);
     g.fillRect(W * 0.04, BASE, W * 0.24, H - BASE);
 
-    g.fillStyle(0x010407, 1);
+    g.fillStyle(0x010305, 1);
     const trees: [number, number][] = [
       [W * 0.09, 28], [W * 0.13, 44], [W * 0.17, 36], [W * 0.21, 26],
     ];
@@ -106,7 +106,7 @@ export class OceanBackgroundScene extends Phaser.Scene {
       g.fillTriangle(tx, BASE - th - 14, tx - 6, BASE - th + 2, tx + 6, BASE - th + 2);
     }
 
-    g.fillStyle(0x020609, 1);
+    g.fillStyle(0x010406, 1);
     g.fillTriangle(W * 0.80, BASE, W * 0.87, BASE - 36, W * 0.96, BASE);
     g.fillRect(W * 0.80, BASE, W * 0.16, H - BASE);
   }
@@ -119,29 +119,29 @@ export class OceanBackgroundScene extends Phaser.Scene {
     const sx = W * 0.97 + 42;
     const sy = HORIZON - 2 + bobY;
 
-    g.fillStyle(0x1A0A03, 1);
+    g.fillStyle(0x140802, 1);
     g.fillTriangle(sx - 28, sy, sx + 28, sy, sx + 22, sy + 14);
     g.fillTriangle(sx - 28, sy, sx - 22, sy + 14, sx + 22, sy + 14);
     g.fillRect(sx - 22, sy + 14, 44, 5);
-    g.lineStyle(1, 0x8B6914, 0.7);
+    g.lineStyle(1, 0x7A5810, 0.6);
     g.lineBetween(sx - 22, sy + 14, sx + 22, sy + 14);
-    g.fillStyle(0x2E1507, 1);
+    g.fillStyle(0x261004, 1);
     g.fillRect(sx - 1, sy - 48, 3, 48);
     g.fillRect(sx - 20, sy - 42, 40, 2);
-    g.fillStyle(0xD4B483, 0.85);
+    g.fillStyle(0xC8A870, 0.8);
     g.fillRect(sx - 18, sy - 42, 36, 28);
-    g.fillStyle(0xC0141A, 1);
+    g.fillStyle(0xB01018, 1);
     g.fillRect(sx - 18, sy - 30, 36, 5);
     g.fillRect(sx - 4,  sy - 42, 5, 28);
-    g.fillStyle(0xD4B483, 0.7);
+    g.fillStyle(0xC8A870, 0.65);
     g.fillRect(sx - 18, sy - 48, 12, 10);
-    g.lineStyle(2, 0x2E1507, 1);
+    g.lineStyle(2, 0x261004, 1);
     g.lineBetween(sx - 28, sy, sx - 42, sy - 16);
-    g.fillStyle(0xC0141A, 0.9);
+    g.fillStyle(0xB01018, 0.85);
     g.fillTriangle(sx + 2, sy - 48, sx + 14, sy - 44, sx + 2, sy - 40);
-    for (let i = 1; i <= 6; i++) {
-      g.fillStyle(0x1A0A03, 0.07 - i * 0.01);
-      g.fillRect(sx - 22 + i, sy + 18 + i * 2, 44 - i * 2, 3);
+    for (let i = 1; i <= 5; i++) {
+      g.fillStyle(0x140802, 0.06 - i * 0.01);
+      g.fillRect(sx - 20 + i, sy + 18 + i * 2, 40 - i * 2, 3);
     }
   }
 
@@ -158,44 +158,33 @@ export class OceanBackgroundScene extends Phaser.Scene {
     const t = time * 0.001;
     const step = 6;
 
-    // ── 1. Mer : UN SEUL polygon du bord à bord, sans aucun rectangle statique dessous ──
-    // On utilise fillGradientStyle pour avoir le dégradé surface→profondeur.
-    // Mais fillGradientStyle + fillPoints ne fonctionnent pas ensemble dans Phaser.
-    // Solution : 3 bandes horizontales chevauchées, chacune avec son polygon,
-    //            en utilisant le MEME contour de vague — donc aucune ligne visible.
+    // Couleur de base nuit : bleu très sombre, presque anthracite
+    // Couche 1 — surface, couleur nuit marine
+    const pts1: Phaser.Math.Vector2[] = [new Phaser.Math.Vector2(0, H)];
+    for (let x = 0; x <= W; x += step)
+      pts1.push(new Phaser.Math.Vector2(x, HORIZON + this.waveY(x, t)));
+    pts1.push(new Phaser.Math.Vector2(W, H));
+    g.fillStyle(0x06111E, 1);
+    g.fillPoints(pts1, true);
 
-    // Bande surface (bleu moyen)
-    const surface: Phaser.Math.Vector2[] = [];
-    surface.push(new Phaser.Math.Vector2(0, H));
-    for (let x = 0; x <= W; x += step) {
-      surface.push(new Phaser.Math.Vector2(x, HORIZON + this.waveY(x, t)));
-    }
-    surface.push(new Phaser.Math.Vector2(W, H));
-    g.fillStyle(0x0D3352, 1);
-    g.fillPoints(surface, true);
+    // Couche 2 — mi-profondeur, légèrement plus froide
+    const pts2: Phaser.Math.Vector2[] = [new Phaser.Math.Vector2(0, H)];
+    for (let x = 0; x <= W; x += step)
+      pts2.push(new Phaser.Math.Vector2(x, HORIZON + this.waveY(x, t) + 28));
+    pts2.push(new Phaser.Math.Vector2(W, H));
+    g.fillStyle(0x040C18, 0.6);
+    g.fillPoints(pts2, true);
 
-    // Bande mi-profondeur (bleu plus froid)
-    const mid: Phaser.Math.Vector2[] = [];
-    mid.push(new Phaser.Math.Vector2(0, H));
-    for (let x = 0; x <= W; x += step) {
-      mid.push(new Phaser.Math.Vector2(x, HORIZON + this.waveY(x, t) + 30));
-    }
-    mid.push(new Phaser.Math.Vector2(W, H));
-    g.fillStyle(0x081E30, 0.75);
-    g.fillPoints(mid, true);
+    // Couche 3 — fond sombre
+    const pts3: Phaser.Math.Vector2[] = [new Phaser.Math.Vector2(0, H)];
+    for (let x = 0; x <= W; x += step)
+      pts3.push(new Phaser.Math.Vector2(x, HORIZON + this.waveY(x, t) + 65));
+    pts3.push(new Phaser.Math.Vector2(W, H));
+    g.fillStyle(0x020608, 0.75);
+    g.fillPoints(pts3, true);
 
-    // Bande profondeur (quasi noir)
-    const deep: Phaser.Math.Vector2[] = [];
-    deep.push(new Phaser.Math.Vector2(0, H));
-    for (let x = 0; x <= W; x += step) {
-      deep.push(new Phaser.Math.Vector2(x, HORIZON + this.waveY(x, t) + 70));
-    }
-    deep.push(new Phaser.Math.Vector2(W, H));
-    g.fillStyle(0x030C14, 0.85);
-    g.fillPoints(deep, true);
-
-    // ── 2. Ligne de surface lumineuse ────────────────────────────────────────
-    g.lineStyle(1.5, 0x68C8E8, 0.35);
+    // Ligne de surface — très subtile, bleu-gris pâle
+    g.lineStyle(1, 0x2A4A5E, 0.45);
     g.beginPath();
     for (let x = 0; x <= W; x += step) {
       const y = HORIZON + this.waveY(x, t);
@@ -203,27 +192,28 @@ export class OceanBackgroundScene extends Phaser.Scene {
     }
     g.strokePath();
 
-    // ── 3. Écume sur crêtes ────────────────────────────────────────────────
+    // Crêtes légères — juste un soupçon d'écume
     for (let x = 0; x < W; x += step) {
       const w = this.waveY(x, t);
-      if (w < -3.5) {
-        g.fillStyle(0xCCEEFF, 0.07 + ((-w - 3.5) / 1.5) * 0.1);
+      if (w < -3.8) {
+        g.fillStyle(0xB8D8E8, 0.045 + ((-w - 3.8) / 1.2) * 0.055);
         g.fillRect(x, HORIZON + w, step, 1);
       }
     }
 
-    // ── 4. Shimmer : reflets brillants animés ─────────────────────────────────
-    for (let i = 0; i < 22; i++) {
-      const rx  = (W * 0.15 + i * 46 + Math.sin(t * 0.8 + i * 0.9) * 28) % W;
-      const ry  = HORIZON + 12 + i * 9 + Math.sin(t * 1.3 + i * 0.5) * 5;
-      const len = 8 + i * 1.5 + Math.sin(t * 1.5 + i) * 4;
-      const a   = 0.06 + Math.abs(Math.sin(t * 2.0 + i * 0.7)) * 0.08;
-      if (ry < H - 8) {
-        g.fillStyle(0xAADDFF, a);
+    // Shimmer doré — reflets de lune sur l'eau
+    // Concentrés dans la bande du reflet de lune (centre-droite)
+    for (let i = 0; i < 20; i++) {
+      const baseX   = W * 0.6 + Math.sin(t * 0.5 + i * 1.1) * W * 0.22;
+      const rx      = (baseX + Math.sin(t * 1.2 + i * 0.7) * 18) % W;
+      const ry      = HORIZON + 10 + i * 10 + Math.sin(t * 0.9 + i * 0.6) * 6;
+      const len     = 6 + i * 1.2 + Math.sin(t * 1.6 + i) * 3;
+      const a       = (0.04 + Math.abs(Math.sin(t * 1.8 + i * 0.8)) * 0.05) * (1 - i / 22);
+      if (ry < H - 10 && a > 0.005) {
+        g.fillStyle(0xC8B870, a);          // doré lune
         g.fillRect(rx, ry, len, 1);
-        // Reflet double (plus court au-dessous) pour effet brillant
-        g.fillStyle(0xAADDFF, a * 0.4);
-        g.fillRect(rx + 2, ry + 2, len * 0.6, 1);
+        g.fillStyle(0xC8B870, a * 0.35);
+        g.fillRect(rx + 2, ry + 2, len * 0.5, 1);
       }
     }
   }
@@ -238,31 +228,31 @@ export class OceanBackgroundScene extends Phaser.Scene {
 
     const ambW = 100 + pulse * 40;
     for (let r = ambW; r > 0; r -= 5) {
-      this.glowGraphics.fillStyle(0xFFD700, 0.006 * pulse * (r / ambW));
-      this.glowGraphics.fillEllipse(cx, cy, r * 2.5, r * 0.45);
+      this.glowGraphics.fillStyle(0xFFD700, 0.005 * pulse * (r / ambW));
+      this.glowGraphics.fillEllipse(cx, cy, r * 2.5, r * 0.4);
     }
-    const haloR = 22 + pulse * 12;
+    const haloR = 20 + pulse * 10;
     for (let r = haloR; r > 0; r -= 2) {
-      this.glowGraphics.fillStyle(0xFFD700, 0.025 * (r / haloR) * pulse);
+      this.glowGraphics.fillStyle(0xFFD700, 0.022 * (r / haloR) * pulse);
       this.glowGraphics.fillCircle(cx, cy, r);
     }
-    const innerR = 5 + pulse * 4;
+    const innerR = 4 + pulse * 3;
     for (let r = innerR; r > 0; r--) {
-      this.glowGraphics.fillStyle(0xFFFFFF, 0.2 * (r / innerR) * (0.5 + pulse * 0.5));
+      this.glowGraphics.fillStyle(0xFFFFFF, 0.18 * (r / innerR) * (0.5 + pulse * 0.5));
       this.glowGraphics.fillCircle(cx, cy, r);
     }
-    this.glowGraphics.fillStyle(0xFFFDE8, 0.75 + pulse * 0.25);
-    this.glowGraphics.fillCircle(cx, cy, 2 + pulse * 1.5);
+    this.glowGraphics.fillStyle(0xFFFDE8, 0.8 + pulse * 0.2);
+    this.glowGraphics.fillCircle(cx, cy, 2 + pulse * 1.2);
     if (pulse2 > 0.65) {
-      const len = (pulse2 - 0.65) / 0.35 * 18;
-      const a   = (pulse2 - 0.65) / 0.35 * 0.5;
+      const len = (pulse2 - 0.65) / 0.35 * 16;
+      const a   = (pulse2 - 0.65) / 0.35 * 0.45;
       this.glowGraphics.lineStyle(1, 0xFFFFCC, a);
       this.glowGraphics.lineBetween(cx - len, cy, cx + len, cy);
       this.glowGraphics.lineBetween(cx, cy - len, cx, cy + len);
     }
-    const refH = 35 + pulse * 18;
+    const refH = 30 + pulse * 16;
     for (let i = 0; i < refH; i++) {
-      this.glowGraphics.fillStyle(0xFFD700, (1 - i / refH) * 0.05 * pulse);
+      this.glowGraphics.fillStyle(0xFFD700, (1 - i / refH) * 0.04 * pulse);
       this.glowGraphics.fillRect(cx - 1, cy + i, 2, 2);
     }
   }
