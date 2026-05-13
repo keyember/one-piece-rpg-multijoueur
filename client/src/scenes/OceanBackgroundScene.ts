@@ -90,20 +90,14 @@ export class OceanBackgroundScene extends Phaser.Scene {
   }
 
   private drawIslands(): void {
-    const { W, HORIZON } = this;
+    const { W, H, HORIZON } = this;  // H inclus
     const g = this.add.graphics();
-
-    // Les îles sont surlevées : leur base est HORIZON - 18
-    // pour qu'elles émergent clairement au-dessus de la surface
     const BASE = HORIZON - 18;
 
     g.fillStyle(0x020609, 1);
-
-    // Île gauche
     g.fillTriangle(W * 0.04, BASE, W * 0.16, BASE - 52, W * 0.28, BASE);
-    g.fillRect(W * 0.04, BASE, W * 0.24, H - BASE); // socle jusqu'en bas
+    g.fillRect(W * 0.04, BASE, W * 0.24, H - BASE);
 
-    // Arbres sur l'île gauche
     g.fillStyle(0x010407, 1);
     const trees: [number, number][] = [
       [W * 0.09, 28], [W * 0.13, 44], [W * 0.17, 36], [W * 0.21, 26],
@@ -113,10 +107,9 @@ export class OceanBackgroundScene extends Phaser.Scene {
       g.fillTriangle(tx, BASE - th - 14, tx - 6, BASE - th + 2, tx + 6, BASE - th + 2);
     }
 
-    // Île droite
     g.fillStyle(0x020609, 1);
     g.fillTriangle(W * 0.80, BASE, W * 0.87, BASE - 36, W * 0.96, BASE);
-    g.fillRect(W * 0.80, BASE, W * 0.16, H - BASE); // socle jusqu'en bas
+    g.fillRect(W * 0.80, BASE, W * 0.16, H - BASE);
   }
 
   private drawShip(bobY: number): void {
@@ -124,11 +117,9 @@ export class OceanBackgroundScene extends Phaser.Scene {
     const g = this.shipGraphics;
     g.clear();
 
-    // Bateau à droite de l'île droite (W*0.96 = bord droit de l'île)
     const sx = W * 0.97 + 42;
     const sy = HORIZON - 2 + bobY;
 
-    // Coque
     g.fillStyle(0x1A0A03, 1);
     g.fillTriangle(sx - 28, sy, sx + 28, sy, sx + 22, sy + 14);
     g.fillTriangle(sx - 28, sy, sx - 22, sy + 14, sx + 22, sy + 14);
@@ -136,31 +127,25 @@ export class OceanBackgroundScene extends Phaser.Scene {
     g.lineStyle(1, 0x8B6914, 0.7);
     g.lineBetween(sx - 22, sy + 14, sx + 22, sy + 14);
 
-    // Mât
     g.fillStyle(0x2E1507, 1);
     g.fillRect(sx - 1, sy - 48, 3, 48);
-    g.fillRect(sx - 20, sy - 42, 40, 2); // vergue
+    g.fillRect(sx - 20, sy - 42, 40, 2);
 
-    // Voile avec croix rouge
     g.fillStyle(0xD4B483, 0.85);
     g.fillRect(sx - 18, sy - 42, 36, 28);
     g.fillStyle(0xC0141A, 1);
     g.fillRect(sx - 18, sy - 30, 36, 5);
     g.fillRect(sx - 4,  sy - 42, 5, 28);
 
-    // Petite voile avant
     g.fillStyle(0xD4B483, 0.7);
     g.fillRect(sx - 18, sy - 48, 12, 10);
 
-    // Beaupré
     g.lineStyle(2, 0x2E1507, 1);
     g.lineBetween(sx - 28, sy, sx - 42, sy - 16);
 
-    // Pavillon rouge
     g.fillStyle(0xC0141A, 0.9);
     g.fillTriangle(sx + 2, sy - 48, sx + 14, sy - 44, sx + 2, sy - 40);
 
-    // Reflet sous la coque
     for (let i = 1; i <= 6; i++) {
       g.fillStyle(0x1A0A03, 0.07 - i * 0.01);
       g.fillRect(sx - 22 + i, sy + 18 + i * 2, 44 - i * 2, 3);
@@ -175,9 +160,9 @@ export class OceanBackgroundScene extends Phaser.Scene {
 
     for (let x = 0; x < W; x += 3) {
       const wave =
-        Math.sin(x * 0.018 + t * 1.4)          * 5
-        + Math.sin(x * 0.045 + t * 2.1 + 1.2)  * 2.5
-        + Math.sin(x * 0.09  + t * 3.0 + 2.4)  * 1.2;
+        Math.sin(x * 0.018 + t * 1.4)         * 5
+        + Math.sin(x * 0.045 + t * 2.1 + 1.2) * 2.5
+        + Math.sin(x * 0.09  + t * 3.0 + 2.4) * 1.2;
       const surfaceY = HORIZON + wave;
       const lightness = Math.max(0, -wave / 8);
       const color = Phaser.Display.Color.Interpolate.ColorWithColor(
@@ -186,8 +171,7 @@ export class OceanBackgroundScene extends Phaser.Scene {
         100,
         Math.floor(lightness * 100)
       );
-      const hex = Phaser.Display.Color.GetColor(color.r, color.g, color.b);
-      g.fillStyle(hex, 0.85);
+      g.fillStyle(Phaser.Display.Color.GetColor(color.r, color.g, color.b), 0.85);
       g.fillRect(x, surfaceY, 3, H - surfaceY);
     }
 
@@ -198,16 +182,14 @@ export class OceanBackgroundScene extends Phaser.Scene {
         Math.sin(x * 0.018 + t * 1.4)         * 5
         + Math.sin(x * 0.045 + t * 2.1 + 1.2) * 2.5
         + Math.sin(x * 0.09  + t * 3.0 + 2.4) * 1.2;
-      const y = HORIZON + wave;
-      x === 0 ? g.moveTo(x, y) : g.lineTo(x, y);
+      x === 0 ? g.moveTo(x, HORIZON + wave) : g.lineTo(x, HORIZON + wave);
     }
     g.strokePath();
 
     for (let x = 0; x < W; x += 6) {
       const wave1 = Math.sin(x * 0.018 + t * 1.4) * 5;
       if (wave1 < -3.5) {
-        const foam = 0.08 + ((-wave1 - 3.5) / 1.5) * 0.12;
-        g.fillStyle(0xCCEEFF, foam);
+        g.fillStyle(0xCCEEFF, 0.08 + ((-wave1 - 3.5) / 1.5) * 0.12);
         g.fillRect(x, HORIZON + wave1, 5, 1);
       }
     }
