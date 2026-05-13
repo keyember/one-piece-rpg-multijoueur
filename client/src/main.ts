@@ -7,10 +7,14 @@ import { OceanBackgroundScene } from './scenes/OceanBackgroundScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 1024,
-  height: 768,
+  width: window.innerWidth,
+  height: window.innerHeight,
   parent: 'game-container',
   backgroundColor: '#02040C',
+  scale: {
+    mode: Phaser.Scale.RESIZE,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
   physics: {
     default: 'arcade',
     arcade: { gravity: { x: 0, y: 0 }, debug: false },
