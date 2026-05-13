@@ -32,29 +32,22 @@ export class MainMenuScene extends Phaser.Scene {
     const board = document.createElement('div');
     board.className = 'op-tavern-board';
 
-    // Clous
     ['op-nail op-nail-tl','op-nail op-nail-tr','op-nail op-nail-bl','op-nail op-nail-br'].forEach(cls => {
       const n = document.createElement('span');
       n.className = cls;
       board.appendChild(n);
     });
 
-    // Post-it — en dehors du board, positionné en haut à droite de la scène
     const note = document.createElement('div');
     note.className = 'op-pinned-note';
     note.innerHTML = '<div class="op-pin"></div>Menu du jour :<br>Soupe de mer<br>+ Rhum du pays';
     scene.appendChild(note);
 
-    // Titre
     const titleDiv = document.createElement('div');
     titleDiv.className = 'op-board-title';
-    titleDiv.innerHTML = `
-      <span class="op-board-title-main">GRAND LINE ONLINE</span>
-      <span class="op-board-title-sub">RPG MULTIJOUEUR — GRAND LINE</span>
-    `;
+    titleDiv.innerHTML = `<span class="op-board-title-main">GRAND LINE ONLINE</span>`;
     board.appendChild(titleDiv);
 
-    // Items
     const nav = document.createElement('div');
     nav.className = 'op-menu-items';
 
@@ -75,7 +68,6 @@ export class MainMenuScene extends Phaser.Scene {
     });
     board.appendChild(nav);
 
-    // Footer
     const footer = document.createElement('div');
     footer.className = 'op-board-footer';
     footer.innerHTML = `
