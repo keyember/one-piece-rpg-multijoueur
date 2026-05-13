@@ -1,27 +1,32 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --sepia-light:    #F2E8C9;
-  --sepia-mid:      #D4B483;
-  --sepia-dark:     #8B6914;
+  --night-deep:     #010208;
+  --night-mid:      #03091A;
+  --ocean-dark:     #06111E;
+  --ocean-deep:     #020608;
+  --gold:           #C8A84A;
+  --gold-bright:    #E8C860;
+  --gold-dim:       #7A6020;
+  --parchment:      #E8D5A3;
+  --parchment-dark: #C4A96A;
+  --ink:            #0A0804;
+  --marine-red:     #B01018;
+  --marine-blue:    #1B3A6B;
   --sepia-brown:    #3D1F08;
+  --sepia-dark:     #8B6914;
+  --sepia-mid:      #D4B483;
+  --sepia-light:    #F2E8C9;
   --wood-dark:      #1A0D04;
   --wood-mid:       #2E1507;
   --wood-light:     #5C2A10;
-  --marine-red:     #C0141A;
-  --marine-blue:    #1B3A6B;
-  --gold:           #D4A017;
-  --ink:            #1A0D04;
-  --parchment:      #E8D5A3;
-  --parchment-dark: #C4A96A;
 }
 
 body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  /* Ciel nocturne en CSS pur — aucun artefact WebGL */
-  background: linear-gradient(to bottom, #010208 0%, #020918 55%, #03091A 100%);
+  background: var(--night-deep);
   font-family: 'IM Fell English', Georgia, serif;
 }
 
@@ -36,253 +41,294 @@ body {
   height: 100% !important;
 }
 
-/* Lune en CSS positionnée en haut-droite */
-#css-moon {
-  position: fixed;
-  top: 8vh;
-  right: 17vw;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #EDE3BB;
-  box-shadow:
-    -11px -9px 0 0 #020918,   /* masque pour faire le croissant */
-    0 0 18px 6px rgba(220,210,150,0.18),
-    0 0 40px 12px rgba(200,185,100,0.08);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ==================== WANTED POSTER LOGIN ==================== */
+/* ==================== LOGIN OVERLAY ==================== */
 
 .op-login-scene {
-  position: absolute;
+  position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
-}
-
-.op-wanted-poster {
-  width: 400px;
-  background: var(--parchment);
-  border: 6px solid var(--sepia-dark);
-  box-shadow:
-    0 0 0 2px var(--sepia-mid),
-    0 0 0 10px var(--sepia-dark),
-    0 0 0 12px var(--sepia-mid),
-    0 6px 50px rgba(0,0,0,0.85),
-    inset 0 0 60px rgba(139,105,20,0.15);
-  padding: 24px 28px 22px;
-  position: relative;
-}
-
-.op-wanted-poster::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 0% 0%, rgba(139,105,20,0.2) 0%, transparent 40%),
-    radial-gradient(ellipse at 100% 100%, rgba(139,105,20,0.15) 0%, transparent 40%),
-    radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(0,0,0,0.08) 100%);
   pointer-events: none;
 }
 
-.op-poster-watermark {
+/* Carte de navigateur : planche de bois sombre avec bordure dorée */
+.op-nav-card {
+  pointer-events: all;
+  width: 420px;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(60,25,5,0.9) 0%, transparent 55%),
+    linear-gradient(160deg, #1E0D03 0%, #140901 50%, #0E0601 100%);
+  border: 2px solid var(--gold-dim);
+  box-shadow:
+    0 0 0 1px #0A0501,
+    0 0 0 4px var(--gold-dim),
+    0 0 0 5px #0A0501,
+    0 12px 60px rgba(0,0,0,0.95),
+    0 0 40px rgba(200,168,74,0.08),
+    inset 0 0 80px rgba(0,0,0,0.5);
+  padding: 28px 32px 24px;
+  position: relative;
+  clip-path: polygon(
+    0 8px, 8px 0,
+    calc(100% - 8px) 0, 100% 8px,
+    100% calc(100% - 8px), calc(100% - 8px) 100%,
+    8px 100%, 0 calc(100% - 8px)
+  );
+}
+
+/* Coins dorés */
+.op-nav-card::before,
+.op-nav-card::after {
+  content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(-20deg);
+  width: 18px; height: 18px;
+  border-color: var(--gold);
+  border-style: solid;
+  opacity: 0.7;
+}
+.op-nav-card::before { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+.op-nav-card::after  { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+
+/* Coins bas-gauche et haut-droite via pseudo sur un wrapper interne */
+.op-nav-card-corners::before,
+.op-nav-card-corners::after {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  border-color: var(--gold);
+  border-style: solid;
+  opacity: 0.7;
+  pointer-events: none;
+}
+.op-nav-card-corners::before { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+.op-nav-card-corners::after  { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+
+/* En-tête */
+.op-nav-header {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(200,168,74,0.25);
+  position: relative;
+}
+
+.op-nav-authority {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  color: rgba(200,168,74,0.55);
+  letter-spacing: 3px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Titre principal — style parchemin de prime mais fond sombre */
+.op-nav-title {
   font-family: 'Bangers', cursive;
   font-size: 72px;
+  line-height: 0.88;
+  letter-spacing: 8px;
+  display: block;
+  /* Dégradé or sur fond noir, style gravure */
+  background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 50%, var(--gold-dim) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 8px rgba(200,168,74,0.3));
+}
+
+.op-nav-subtitle {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--marine-red);
+  letter-spacing: 6px;
+  display: block;
+  margin-top: 6px;
+  text-shadow: 0 0 10px rgba(176,16,24,0.5);
+}
+
+/* Filigrane MARINE discret */
+.op-nav-watermark {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(-20deg);
+  font-family: 'Bangers', cursive;
+  font-size: 64px;
   color: var(--marine-blue);
-  opacity: 0.06;
+  opacity: 0.04;
   letter-spacing: 8px;
   pointer-events: none;
   white-space: nowrap;
   user-select: none;
 }
 
-.op-poster-header {
-  text-align: center;
-  padding-bottom: 12px;
-  margin-bottom: 14px;
-  border-bottom: 3px double var(--sepia-dark);
-  position: relative;
-}
-
-.op-poster-authority {
-  font-family: 'Cinzel', serif;
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--marine-blue);
-  letter-spacing: 3px;
-  display: block;
-  margin-bottom: 6px;
-}
-
-.op-poster-wanted {
-  font-family: 'Bangers', cursive;
-  font-size: 80px;
-  color: var(--ink);
-  line-height: 0.85;
-  letter-spacing: 8px;
-  display: block;
-  text-shadow: 3px 3px 0 rgba(0,0,0,0.12);
-}
-
-.op-poster-dead-alive {
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  font-weight: 900;
-  color: var(--marine-red);
-  letter-spacing: 6px;
-  display: block;
-  margin-top: 4px;
-}
-
-.op-poster-tabs {
+/* Tabs */
+.op-nav-tabs {
   display: flex;
-  margin-bottom: 16px;
-  border: 2px solid var(--sepia-dark);
+  margin-bottom: 18px;
+  border: 1px solid rgba(200,168,74,0.2);
   overflow: hidden;
 }
 
-.op-poster-tab {
+.op-nav-tab {
   flex: 1;
-  padding: 7px 4px;
+  padding: 8px 4px;
   font-family: 'Cinzel', serif;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 2px;
-  background: var(--parchment-dark);
+  letter-spacing: 2.5px;
+  background: transparent;
   border: none;
-  color: var(--sepia-brown);
+  color: rgba(200,168,74,0.4);
   cursor: pointer;
   transition: all .2s;
-  opacity: 0.7;
 }
 
-.op-poster-tab.active {
-  background: var(--sepia-brown);
-  color: var(--parchment);
-  opacity: 1;
+.op-nav-tab.active {
+  background: rgba(200,168,74,0.1);
+  color: var(--gold);
+  border-bottom: 2px solid var(--gold);
 }
 
-.op-poster-tab:hover:not(.active) {
-  background: var(--sepia-mid);
-  opacity: 0.9;
+.op-nav-tab:hover:not(.active) {
+  color: rgba(200,168,74,0.7);
+  background: rgba(200,168,74,0.04);
 }
 
-.op-poster-field { margin-bottom: 12px; }
+/* Champs */
+.op-nav-field { margin-bottom: 14px; }
 
-.op-poster-label {
+.op-nav-label {
   display: block;
   font-family: 'Cinzel', serif;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 700;
-  color: var(--sepia-brown);
+  color: rgba(200,168,74,0.45);
   letter-spacing: 3px;
-  margin-bottom: 4px;
-  opacity: 0.7;
+  margin-bottom: 5px;
 }
 
-.op-poster-input {
+.op-nav-input {
   width: 100%;
-  padding: 8px 10px;
+  padding: 9px 0;
   font-family: 'IM Fell English', serif;
   font-size: 15px;
-  background: rgba(255,255,255,0.35);
+  background: transparent;
   border: none;
-  border-bottom: 2px solid var(--sepia-dark);
-  color: var(--ink);
+  border-bottom: 1px solid rgba(200,168,74,0.25);
+  color: rgba(240,230,200,0.9);
   outline: none;
-  transition: border-color .2s, background .2s;
+  transition: border-color .2s;
 }
 
-.op-poster-input::placeholder {
-  color: var(--sepia-dark);
-  opacity: 0.45;
+.op-nav-input::placeholder {
+  color: rgba(200,168,74,0.2);
   font-style: italic;
 }
 
-.op-poster-input:focus {
-  background: rgba(255,255,255,0.6);
-  border-bottom-color: var(--marine-red);
+.op-nav-input:focus {
+  border-bottom-color: var(--gold);
 }
 
-.op-poster-error {
-  color: var(--marine-red);
+/* Erreur */
+.op-nav-error {
+  color: #E05060;
   font-family: 'Cinzel', serif;
   font-size: 10px;
   letter-spacing: 1px;
-  font-weight: 700;
   text-align: center;
   min-height: 14px;
   margin: 6px 0;
 }
 
-.op-poster-btn {
+/* Bouton principal */
+.op-nav-btn {
   width: 100%;
-  margin-top: 4px;
-  padding: 13px;
+  margin-top: 6px;
+  padding: 12px;
   font-family: 'Bangers', cursive;
-  font-size: 28px;
-  letter-spacing: 5px;
-  background: var(--marine-red);
-  color: var(--parchment);
-  border: 3px solid #8a0e12;
-  box-shadow: 0 4px 0 #5a0909, inset 0 1px 0 rgba(255,255,255,0.12);
+  font-size: 26px;
+  letter-spacing: 6px;
+  background: linear-gradient(180deg, rgba(176,16,24,0.9) 0%, rgba(120,8,14,0.95) 100%);
+  color: rgba(240,220,180,0.95);
+  border: 1px solid rgba(176,16,24,0.6);
+  box-shadow:
+    0 4px 0 rgba(80,4,8,0.8),
+    0 0 20px rgba(176,16,24,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.08);
   cursor: pointer;
   transition: all .15s;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
   display: block;
+  letter-spacing: 5px;
 }
 
-.op-poster-btn:hover  { filter: brightness(1.1); }
-.op-poster-btn:active { transform: translateY(3px); box-shadow: none; }
-.op-poster-btn:disabled { filter: grayscale(0.5) brightness(0.7); cursor: not-allowed; }
+.op-nav-btn:hover  {
+  background: linear-gradient(180deg, rgba(200,20,28,0.95) 0%, rgba(140,10,16,1) 100%);
+  box-shadow: 0 4px 0 rgba(80,4,8,0.8), 0 0 30px rgba(200,20,28,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.op-nav-btn:active  { transform: translateY(3px); box-shadow: 0 1px 0 rgba(80,4,8,0.8); }
+.op-nav-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-.op-poster-divider {
+/* Séparateur */
+.op-nav-divider {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-family: 'Cinzel', serif;
-  font-size: 9px;
+  font-size: 8px;
   letter-spacing: 3px;
-  color: var(--sepia-dark);
-  margin: 12px 0 10px;
-  opacity: 0.7;
+  color: rgba(200,168,74,0.3);
+  margin: 14px 0 12px;
 }
-.op-poster-divider::before,
-.op-poster-divider::after {
+.op-nav-divider::before,
+.op-nav-divider::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: var(--sepia-dark);
-  opacity: 0.5;
+  background: rgba(200,168,74,0.15);
 }
 
-.op-poster-oauth { display: flex; gap: 8px; }
+/* OAuth */
+.op-nav-oauth { display: flex; gap: 8px; }
 
-.op-poster-oauth-btn {
+.op-nav-oauth-btn {
   flex: 1;
-  padding: 8px;
+  padding: 9px;
   font-family: 'Cinzel', serif;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 1px;
   text-align: center;
   text-decoration: none;
-  border: 2px solid;
+  border: 1px solid;
   cursor: pointer;
   display: block;
-  transition: filter .15s;
+  transition: all .15s;
+  background: transparent;
 }
-.op-poster-oauth-btn:hover { filter: brightness(1.2); }
-.op-oauth-discord { background: #3b3f8c; border-color: #5865F2; color: #fff; }
-.op-oauth-google  { background: #1a356e; border-color: #4285F4; color: #fff; }
+.op-nav-oauth-btn:hover { filter: brightness(1.3); }
+.op-oauth-discord {
+  border-color: rgba(88,101,242,0.5);
+  color: rgba(88,101,242,0.8);
+}
+.op-oauth-discord:hover {
+  background: rgba(88,101,242,0.12);
+  border-color: #5865F2;
+  color: #5865F2;
+}
+.op-oauth-google {
+  border-color: rgba(66,133,244,0.5);
+  color: rgba(66,133,244,0.8);
+}
+.op-oauth-google:hover {
+  background: rgba(66,133,244,0.12);
+  border-color: #4285F4;
+  color: #4285F4;
+}
 
 /* ==================== MAIN MENU TAVERNE ==================== */
 
