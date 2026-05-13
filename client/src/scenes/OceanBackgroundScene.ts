@@ -15,8 +15,6 @@ export class OceanBackgroundScene extends Phaser.Scene {
   private seaTime = 0;
   private shootingStars: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
   private shootingTimer = 0;
-
-  // Bateau
   private shipBob = 0;
 
   constructor() { super({ key: 'OceanBackgroundScene' }); }
@@ -36,8 +34,6 @@ export class OceanBackgroundScene extends Phaser.Scene {
     this.starGraphics = this.add.graphics();
   }
 
-  // ─── FOND STATIQUE ────────────────────────────────────────────────────────────
-
   private drawStaticBg(): void {
     const { W, H, HORIZON } = this;
 
@@ -45,12 +41,10 @@ export class OceanBackgroundScene extends Phaser.Scene {
     sky.fillGradientStyle(0x01030A, 0x01030A, 0x05101E, 0x05101E, 1);
     sky.fillRect(0, 0, W, HORIZON + 2);
 
-    // Mer de base (couleur sombre, les vagues se dessinent par-dessus)
     const sea = this.add.graphics();
     sea.fillGradientStyle(0x06192E, 0x06192E, 0x010608, 0x010608, 1);
     sea.fillRect(0, HORIZON, W, H - HORIZON);
 
-    // Lune croissant
     const moon = this.add.graphics();
     moon.fillStyle(0xEDE3BB, 0.95);
     moon.fillCircle(W * 0.76, H * 0.13, 28);
@@ -61,15 +55,12 @@ export class OceanBackgroundScene extends Phaser.Scene {
       moon.fillCircle(W * 0.76, H * 0.13, r);
     }
 
-    // Reflet lune
     const ref = this.add.graphics();
     for (let i = 0; i < 30; i++) {
       ref.fillStyle(0xDDD0A0, 0.013 - i * 0.0004);
       ref.fillEllipse(W * 0.76, HORIZON + 8 + i * 7, 38 - i * 0.5, 5);
     }
   }
-
-  // ─── ÉTOILES ──────────────────────────────────────────────────────────────────
 
   private initStars(): void {
     const { W, HORIZON } = this;
@@ -98,40 +89,43 @@ export class OceanBackgroundScene extends Phaser.Scene {
     }
   }
 
-  // ─── ÎLES ─────────────────────────────────────────────────────────────────────
-
   private drawIslands(): void {
     const { W, HORIZON } = this;
     const g = this.add.graphics();
+
+    // Les îles sont surlevées : leur base est HORIZON - 18
+    // pour qu'elles émergent clairement au-dessus de la surface
+    const BASE = HORIZON - 18;
+
     g.fillStyle(0x020609, 1);
 
     // Île gauche
-    g.fillTriangle(W * 0.04, HORIZON, W * 0.16, HORIZON - 52, W * 0.28, HORIZON);
-    g.fillRect(W * 0.04, HORIZON, W * 0.24, 6);
+    g.fillTriangle(W * 0.04, BASE, W * 0.16, BASE - 52, W * 0.28, BASE);
+    g.fillRect(W * 0.04, BASE, W * 0.24, H - BASE); // socle jusqu'en bas
+
+    // Arbres sur l'île gauche
     g.fillStyle(0x010407, 1);
     const trees: [number, number][] = [
       [W * 0.09, 28], [W * 0.13, 44], [W * 0.17, 36], [W * 0.21, 26],
     ];
     for (const [tx, th] of trees) {
-      g.fillRect(tx - 1, HORIZON - th, 3, th);
-      g.fillTriangle(tx, HORIZON - th - 14, tx - 6, HORIZON - th + 2, tx + 6, HORIZON - th + 2);
+      g.fillRect(tx - 1, BASE - th, 3, th);
+      g.fillTriangle(tx, BASE - th - 14, tx - 6, BASE - th + 2, tx + 6, BASE - th + 2);
     }
 
     // Île droite
     g.fillStyle(0x020609, 1);
-    g.fillTriangle(W * 0.80, HORIZON, W * 0.87, HORIZON - 36, W * 0.96, HORIZON);
-    g.fillRect(W * 0.80, HORIZON, W * 0.16, 6);
+    g.fillTriangle(W * 0.80, BASE, W * 0.87, BASE - 36, W * 0.96, BASE);
+    g.fillRect(W * 0.80, BASE, W * 0.16, H - BASE); // socle jusqu'en bas
   }
-
-  // ─── BATEAU PIRATE ────────────────────────────────────────────────────────────
 
   private drawShip(bobY: number): void {
     const { W, HORIZON } = this;
     const g = this.shipGraphics;
     g.clear();
 
-    // Position : devant l'île droite
-    const sx = W * 0.72;
+    // Bateau à droite de l'île droite (W*0.96 = bord droit de l'île)
+    const sx = W * 0.97 + 42;
     const sy = HORIZON - 2 + bobY;
 
     // Coque
@@ -139,73 +133,53 @@ export class OceanBackgroundScene extends Phaser.Scene {
     g.fillTriangle(sx - 28, sy, sx + 28, sy, sx + 22, sy + 14);
     g.fillTriangle(sx - 28, sy, sx - 22, sy + 14, sx + 22, sy + 14);
     g.fillRect(sx - 22, sy + 14, 44, 5);
-
-    // Liseré doré sur la coque
     g.lineStyle(1, 0x8B6914, 0.7);
     g.lineBetween(sx - 22, sy + 14, sx + 22, sy + 14);
 
-    // Mât principal
+    // Mât
     g.fillStyle(0x2E1507, 1);
     g.fillRect(sx - 1, sy - 48, 3, 48);
+    g.fillRect(sx - 20, sy - 42, 40, 2); // vergue
 
-    // Vergue (barre horizontale)
-    g.fillRect(sx - 20, sy - 42, 40, 2);
-
-    // Voile principale (rectangle avec croix rouge)
+    // Voile avec croix rouge
     g.fillStyle(0xD4B483, 0.85);
     g.fillRect(sx - 18, sy - 42, 36, 28);
-    // Croix rouge One Piece
     g.fillStyle(0xC0141A, 1);
-    g.fillRect(sx - 18, sy - 30, 36, 5);  // barre horizontale
-    g.fillRect(sx - 4,  sy - 42, 5, 28);  // barre verticale
+    g.fillRect(sx - 18, sy - 30, 36, 5);
+    g.fillRect(sx - 4,  sy - 42, 5, 28);
 
-    // Petite voile de misaine
+    // Petite voile avant
     g.fillStyle(0xD4B483, 0.7);
     g.fillRect(sx - 18, sy - 48, 12, 10);
 
-    // Mât de beaupré (diagonal avant)
+    // Beaupré
     g.lineStyle(2, 0x2E1507, 1);
     g.lineBetween(sx - 28, sy, sx - 42, sy - 16);
 
-    // Pavillon (en haut du mât)
+    // Pavillon rouge
     g.fillStyle(0xC0141A, 0.9);
     g.fillTriangle(sx + 2, sy - 48, sx + 14, sy - 44, sx + 2, sy - 40);
 
-    // Reflet flou sous la coque
+    // Reflet sous la coque
     for (let i = 1; i <= 6; i++) {
-      g.fillStyle(0x1A0A03, 0.08 - i * 0.012);
+      g.fillStyle(0x1A0A03, 0.07 - i * 0.01);
       g.fillRect(sx - 22 + i, sy + 18 + i * 2, 44 - i * 2, 3);
     }
   }
-
-  // ─── MER (rework complet) ─────────────────────────────────────────────────────
-  //
-  // Approche : on dessine la surface de la mer comme un champ de vagues
-  // en utilisant la superposition de plusieurs sinus = vraie houle.
-  // Puis des crêtes d'écume se déplacent par-dessus.
-  //
 
   private drawSea(time: number): void {
     const { W, H, HORIZON } = this;
     const g = this.seaGraphics;
     g.clear();
-
     const t = time * 0.001;
 
-    // ── 1. Surface de la mer : remplissage par scanlines ──────────────────────
-    // On calcule la hauteur de la vague pour chaque colonne x,
-    // puis on remplit vers le bas. Ça donne une vraie surface ondulée.
     for (let x = 0; x < W; x += 3) {
-      // Superposition de 3 ondes = houle réaliste
       const wave =
-        Math.sin(x * 0.018 + t * 1.4)          * 5   // grande houle
-        + Math.sin(x * 0.045 + t * 2.1 + 1.2)  * 2.5 // vague moyenne
-        + Math.sin(x * 0.09  + t * 3.0 + 2.4)  * 1.2; // clapot
-
+        Math.sin(x * 0.018 + t * 1.4)          * 5
+        + Math.sin(x * 0.045 + t * 2.1 + 1.2)  * 2.5
+        + Math.sin(x * 0.09  + t * 3.0 + 2.4)  * 1.2;
       const surfaceY = HORIZON + wave;
-
-      // Couleur : les crêtes (wave < 0 = haut) sont plus claires
-      const lightness = Math.max(0, -wave / 8); // 0..0.8
+      const lightness = Math.max(0, -wave / 8);
       const color = Phaser.Display.Color.Interpolate.ColorWithColor(
         { r: 6,  g: 25, b: 46,  a: 255 },
         { r: 20, g: 60, b: 100, a: 255 },
@@ -217,7 +191,6 @@ export class OceanBackgroundScene extends Phaser.Scene {
       g.fillRect(x, surfaceY, 3, H - surfaceY);
     }
 
-    // ── 2. Ligne de surface lumineuse ─────────────────────────────────────────
     g.lineStyle(1, 0x4A9CC0, 0.25);
     g.beginPath();
     for (let x = 0; x <= W; x += 4) {
@@ -230,18 +203,15 @@ export class OceanBackgroundScene extends Phaser.Scene {
     }
     g.strokePath();
 
-    // ── 3. Crêtes d'écume : bandes blanches sur les sommets de vague ──────────
     for (let x = 0; x < W; x += 6) {
       const wave1 = Math.sin(x * 0.018 + t * 1.4) * 5;
       if (wave1 < -3.5) {
-        // On est sur une crête → trait d'écume
         const foam = 0.08 + ((-wave1 - 3.5) / 1.5) * 0.12;
         g.fillStyle(0xCCEEFF, foam);
         g.fillRect(x, HORIZON + wave1, 5, 1);
       }
     }
 
-    // ── 4. Reflets de lumière (shimmer) ───────────────────────────────────────
     for (let i = 0; i < 18; i++) {
       const rx = (W * 0.3 + i * 38 + Math.sin(t * 0.7 + i) * 20) % W;
       const ry = HORIZON + 15 + i * 9 + Math.sin(t * 1.2 + i * 0.5) * 4;
@@ -251,14 +221,11 @@ export class OceanBackgroundScene extends Phaser.Scene {
       }
     }
 
-    // ── 5. Profondeur : fondu sombre vers le bas ───────────────────────────────
     for (let i = 0; i < 30; i++) {
       g.fillStyle(0x000000, 0.018);
       g.fillRect(0, H - 30 + i, W, 1);
     }
   }
-
-  // ─── ONE PIECE GLOW ───────────────────────────────────────────────────────────
 
   private drawOnePieceGlow(): void {
     const { W, HORIZON } = this;
@@ -299,8 +266,6 @@ export class OceanBackgroundScene extends Phaser.Scene {
     }
   }
 
-  // ─── ÉTOILES FILANTES ─────────────────────────────────────────────────────────
-
   private updateShootingStars(delta: number): void {
     this.shootingTimer += delta;
     if (this.shootingTimer > 9000 + Math.random() * 7000) {
@@ -322,8 +287,6 @@ export class OceanBackgroundScene extends Phaser.Scene {
       return ss.life > 0 && ss.x < this.W && ss.y < this.HORIZON;
     });
   }
-
-  // ─── LOOP ─────────────────────────────────────────────────────────────────────
 
   update(time: number, delta: number): void {
     this.seaTime  += delta;
