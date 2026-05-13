@@ -11,12 +11,10 @@ export class MainMenuScene extends Phaser.Scene {
     if (!token) token = await refreshAccessToken();
     if (!token) { this.scene.start('LoginScene'); return; }
 
-    // Réutiliser ou lancer la scène de fond
     if (!this.scene.isActive('OceanBackgroundScene')) {
       this.scene.launch('OceanBackgroundScene');
     }
     this.scene.sendToBack('OceanBackgroundScene');
-
     this.renderUI();
   }
 
@@ -36,7 +34,9 @@ export class MainMenuScene extends Phaser.Scene {
 
     // Clous
     ['op-nail op-nail-tl','op-nail op-nail-tr','op-nail op-nail-bl','op-nail op-nail-br'].forEach(cls => {
-      const n = document.createElement('span'); n.className = cls; board.appendChild(n);
+      const n = document.createElement('span');
+      n.className = cls;
+      board.appendChild(n);
     });
 
     // Parchemin épinglé
@@ -50,20 +50,20 @@ export class MainMenuScene extends Phaser.Scene {
     titleDiv.className = 'op-board-title';
     titleDiv.innerHTML = `
       <span class="op-board-title-main">🏴‍☠️ ONE PIECE</span>
-      <span class="op-board-ornament">⚓ • ⚔ • ⚓</span>
+      <span class="op-board-ornament">⚔ · ⚓ · ⚔</span>
       <span class="op-board-title-sub">GRAND LINE ONLINE — RPG MULTIJOUEUR</span>
     `;
     board.appendChild(titleDiv);
 
-    // Nav
+    // Items
     const nav = document.createElement('div');
     nav.className = 'op-menu-items';
 
     const items = [
       { icon: '▶', label: 'PRENDRE LA MER',  cls: '',       fn: () => { this.cleanup(); this.scene.stop('OceanBackgroundScene'); this.scene.start('WorldScene'); } },
-      { icon: '⚔',  label: 'MON PIRATE',      cls: '',       fn: () => this.showModal('MON PIRATE', 'Créez et gérez votre personnage, choisissez votre fruit du démon et votre équipage. Bientôt disponible !') },
-      { icon: '🗺', label: 'LA CARTE',        cls: '',       fn: () => this.showModal('LA CARTE', 'Explorez le monde de One Piece : East Blue, Grand Line, Nouveau Monde... Bientôt disponible !') },
-      { icon: '⚙',  label: 'OPTIONS',         cls: '',       fn: () => this.showModal('OPTIONS', 'Paramètres audio, vidéo et contrôles du jeu. Bientôt disponible !') },
+      { icon: '⚔',  label: 'MON PIRATE',      cls: '',       fn: () => this.showModal('MON PIRATE', 'Créez et gérez votre personnage, choisissez votre fruit du démon et votre équipage. Bientôt disponible !') },
+      { icon: '🗺', label: 'LA CARTE',        cls: '',       fn: () => this.showModal('LA CARTE', 'Explorez le monde de One Piece : East Blue, Grand Line, Nouveau Monde... Bientôt disponible !') },
+      { icon: '⚙',  label: 'OPTIONS',         cls: '',       fn: () => this.showModal('OPTIONS', 'Paramètres audio, vidéo et contrôles du jeu. Bientôt disponible !') },
       { icon: '🚪', label: 'QUITTER LE PORT', cls: 'danger', fn: () => this.handleLogout() },
     ];
 
