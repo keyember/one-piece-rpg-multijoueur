@@ -30,7 +30,7 @@ export async function register(
   email: string,
   username: string,
   password: string
-): Promise<{ accessToken: string; username: string }> {
+): Promise<{ message: string }> {
   const res = await fetchWithAuth(`${SERVER_URL}/auth/register`, {
     method: 'POST',
     body: JSON.stringify({ email, username, password }),
