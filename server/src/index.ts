@@ -9,6 +9,7 @@ import { registerSocketHandlers } from './socket/handlers';
 import { applySocketAuth } from './socket/socketAuth';
 import { authRouter } from './auth/routes';
 import { oauthRouter } from './auth/oauth';
+import { runMigrations } from './db/migrate';
 
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 if (!CLIENT_ORIGIN) {
@@ -37,13 +38,11 @@ app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 app.use(passport.initialize());
 
-// Routes auth
 app.use('/auth', authRouter);
 app.use('/auth', oauthRouter);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
-// Socket.io : auth obligatoire au handshake
 applySocketAuth(io);
 
 const gameManager = new GameManager();
@@ -55,6 +54,14 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {
-  console.log(`🏴‍☠️ Serveur lancé sur le port ${PORT}`);
-});
+
+runMigrations()
+  .then(() => {
+    httpServer.listen(PORT, () => {
+      console.log(`🏴‍☠️ Serveur lancé sur le port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('[FATAL] Échec des migrations:', err);
+    process.exit(1);
+  });
