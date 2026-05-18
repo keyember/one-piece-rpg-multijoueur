@@ -1,14 +1,16 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST!,
-  port: Number(process.env.SMTP_PORT ?? 587),
-  secure: process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER!,
-    pass: process.env.SMTP_PASS!,
-  },
-});
+function createTransporter() {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST!,
+    port: Number(process.env.SMTP_PORT ?? 587),
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: {
+      user: process.env.SMTP_USER!,
+      pass: process.env.SMTP_PASS!,
+    },
+  });
+}
 
 export async function sendVerificationEmail(
   to: string,
@@ -17,7 +19,7 @@ export async function sendVerificationEmail(
   const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN!;
   const link = `${CLIENT_ORIGIN}/verify-email?token=${token}`;
 
-  await transporter.sendMail({
+  await createTransporter().sendMail({
     from: `"Grand Line Online" <${process.env.SMTP_USER}>`,
     to,
     subject: 'Vérification de ton adresse email — Grand Line Online',
